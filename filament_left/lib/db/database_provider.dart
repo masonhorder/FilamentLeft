@@ -381,7 +381,7 @@ class DatabaseProviderSpool {
 
   static const String COLUMN_PROFILE_ID = "profileId";
   static const String COLUMN_COLOR = "color";
-  static const String COLUMN_INDEX = "index";
+  static const String COLUMN_INDEX = "spoolIndex";
 
   DatabaseProviderSpool._();
   static final DatabaseProviderSpool db = DatabaseProviderSpool._();
@@ -416,7 +416,7 @@ class DatabaseProviderSpool {
           "$COLUMN_ID INTEGER PRIMARY KEY,"
           "$COLUMN_PROFILE_ID INTEGER,"
           "$COLUMN_COLOR TEXT,"
-          "$COLUMN_INDEX INT,"
+          "$COLUMN_INDEX INT"
           ")",
         );
       },

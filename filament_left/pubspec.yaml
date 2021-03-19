@@ -70,7 +70,7 @@ flutter:
   assets:
     - assets/help-diam.png
     - assets/help-circumference.png
-    - assets/v4-model.tflite
+    - assets/v5-model.tflite
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

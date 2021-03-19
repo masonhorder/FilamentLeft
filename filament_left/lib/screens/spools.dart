@@ -9,6 +9,7 @@ import 'package:filament_left/models/calculateForm.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/measure.dart';
 import 'package:filament_left/models/profiles.dart';
+import 'package:filament_left/models/spool.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +46,8 @@ class SpoolsState extends State<Spools> {
       },
     );
     DatabaseProviderSpool.db.getSpools(context).then(
-      (profileList) {
-        BlocProvider.of<SpoolBloc>(context).add(SetSpools(profileList));
+      (spoolList) {
+        BlocProvider.of<SpoolBloc>(context).add(SetSpools(spoolList));
       },
     );
     DatabaseProviderMeasure.db.getMeasures(context).then(
@@ -58,6 +59,7 @@ class SpoolsState extends State<Spools> {
 
   @override
   Widget build(BuildContext context) {
+
 
       
 
@@ -71,9 +73,10 @@ class SpoolsState extends State<Spools> {
               return BlocConsumer<MeasureBloc, List<Measure>>(
                 listener: (BuildContext context, profileList) {},
                 builder: (context, measureList) {
-                  return BlocConsumer<MeasureBloc, List<Measure>>(
+                  return BlocConsumer<SpoolBloc, List<Spool>>(
                     listener: (BuildContext context, spoolList) {},
                     builder: (context, spoolList) {
+                      print("spool list: " + spoolList.toString());
                   
                       // print(measureList);
                       if(measureList.length != 0){
@@ -89,15 +92,24 @@ class SpoolsState extends State<Spools> {
                       return Column(
                         children: [
                           SizedBox(height: CurrentDevice.hasNotch ? 36 : 10),
-
+                          
                           Center(child:Text("Spools", style: pageHeader,)),
                           SizedBox(height: 15),
-                          
-                          ListView.builder(
-                            itemBuilder: (context, index){
-                              return CircularProgressIndicator();
-                            }
-                          )
+                          Expanded(
+                            child: ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: spoolList.length,
+                              itemBuilder: (context, index){
+                                print(spoolList.length);
+                                if(spoolList.toString() == "[]" || spoolList == null){
+                                  print("no spools");
+                                  return Text("No spools created yet, add one below");
+                                }
+                                return Text(spoolList[index].toString());
+                              }
+                            )
+                          ),
 
                           
                         ],
