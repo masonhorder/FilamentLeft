@@ -123,7 +123,7 @@ class CameraState extends State<Camera> {
   Future recognize(List imageList) async {
     print("recognize");
     debugString += "\nrunning model";
-    final interpreter = await tfl.Interpreter.fromAsset('v5-model.tflite');
+    final interpreter = await tfl.Interpreter.fromAsset('v6-model.tflite');
     debugString += "\n1";
     var input = imageList.reshape([1,224,224,3]);
     debugString += "\n2";
