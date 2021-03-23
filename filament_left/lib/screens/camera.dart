@@ -109,34 +109,33 @@ class CameraState extends State<Camera> {
     });
     // print("preconvert");
     List converted = await preConvert();
-    await recognize(converted);
-    await postConvert();
+    // await recognize(converted);
+    await postConvert(await recognize(converted));
     ratio = (finalCoordinates[3]-finalCoordinates[1])/(finalCoordinates[2]-finalCoordinates[0]);
     print(ratio);
     debugString += "\nratio: $ratio";
 
     setState(() {
       byteData = originalByteData.buffer.asUint8List();      
+      if(Scan.profile != null){
+        Scan.meters = filamentLeft((Scan.profile.width*ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
+        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width*ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
+        Scan.diameter = (Scan.profile.width*ratio).round();
+      }
     });
+
+    
   }
 
-  Future recognize(List imageList) async {
+  Future<List> recognize(List imageList) async {
     print("recognize");
-    debugString += "\nrunning model";
     final interpreter = await tfl.Interpreter.fromAsset('v6-model.tflite');
-    debugString += "\n1";
     var input = imageList.reshape([1,224,224,3]);
-    debugString += "\n2";
     List output = List(1*4).reshape([1,4]);
-    debugString += "\n3";
     interpreter.run(input, output);
-    debugString += "\n4";
-    _recognition = output;
-    debugString += "\n5";
+    print(output);
     interpreter.close();
-    debugString += "\nmodel done";
-    // debugString += "Error: $error";
-    
+    return output;
   }
 
 
@@ -166,23 +165,21 @@ class CameraState extends State<Camera> {
     return newArray;
   }
 
-  postConvert() async{
+  postConvert(List output) async{
+    finalCoordinates = [];
     print("postconvert");
     debugString += "\npost convert";
     int index = 0;
-    for(var coordinate in _recognition[0]){
+    for(var coordinate in output[0]){
       if((index + 1) % 2 == 0){
-        finalCoordinates.add(coordinate*width);
-        print("coordinate(mainly width) - height than width");
-        print(coordinate*height);
-        print(coordinate*width);
-        
+        setState(() {
+          finalCoordinates.add(coordinate*width);
+        });
       }
       else{
-        finalCoordinates.add(coordinate*height);
-        print("coordinate(mainly height) - height than width");
-        print(coordinate*height);
-        print(coordinate*width);
+        setState(() {
+          finalCoordinates.add(coordinate*height);
+        });
       }
       index++;
       // print(coordinate);
@@ -216,7 +213,13 @@ class CameraState extends State<Camera> {
         title: Text("Filament Scanning", style: popUpTitle,), 
         content: Container(
           child: SingleChildScrollView(
-            child: Text("Hey there, welcome to the Scan feature! Please double check all scanned measurements! This feature works by taking a photo of a spool and the app will automatically recognize filament left. How to take a good photo: Keep full filament spool in frame, Good lighting. Please double check all scanned measurements!", style: basicBlack,),
+            child: Column(
+              children:[
+                Text("Please double check all scanned measurements!", style: basicBlack, textAlign: TextAlign.center,),
+                Text("Example Photo:", style: basicBlackBold,),
+                Image.asset("assets/example.JPG",)
+              ]
+            )
           )
         ),
         
@@ -310,6 +313,11 @@ class CameraState extends State<Camera> {
       body: BlocConsumer<OptInBloc, List<OptIn>>(
         listener: (BuildContext context, optInList) {},
         builder: (context, optInList) {
+          // if(Scan.meters != null){
+          //   Scan.meters = null;
+          //   Scan.grams = null;
+          //   Scan.diameter = null;
+          // }
           if(optInList.length != 0){
             if(optInList[0].optIn == 0 && !popUpTriggered){
               print(optInList);
@@ -398,9 +406,10 @@ class CameraState extends State<Camera> {
                                 children:[
                                   SizedBox(height: 20),
                                   Container(
-                                    child: Center(child: Text("Please line all edges of the spool with frame. Always double check measurements.", textAlign: TextAlign.center,)),
+                                    child: Center(child: Text("Always double check measurements!", textAlign: TextAlign.center,)),
                                     width: MediaQuery.of(context).size.width*.9,
                                   ),
+                                  SizedBox(height:30),
                                   FutureBuilder<void>(
                                     future: _initializeControllerFuture,
                                     builder: (context, snapshot) {
@@ -478,8 +487,27 @@ class CameraState extends State<Camera> {
 
                               :
 
-
-                              Image.file(_image, width: MediaQuery.of(context).size.width *.5,),
+                              Column(
+                                children: [
+                                  Image.file(_image, width: MediaQuery.of(context).size.width *.5,),
+                                  SizedBox(height:3),
+                                  InkWell(
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 30,vertical: 17),
+                                      decoration: BoxDecoration(
+                                        color: darkBlue,
+                                        borderRadius: BorderRadius.circular(10)
+                                      ),
+                                      child: Text("Re-Scan"),
+                                    ),
+                                    onTap: () async {
+                                      setState(() {
+                                        _image = null;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
 
 
                               SizedBox(height:10),
