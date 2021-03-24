@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:filament_left/analytics.dart';
 import 'package:filament_left/bloc/optInBloc.dart';
@@ -54,6 +55,7 @@ class CameraState extends State<Camera> {
   bool showCapturedPhoto = false;
   File imageFile;
   String debugString = "debug:";
+  var rectImage;
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
@@ -116,17 +118,21 @@ class CameraState extends State<Camera> {
     double endX = finalCoordinates[2];
     double endY = finalCoordinates[3];
 
-    ratio = ((endY-startY)/(endX-startX));
+
+    ratio = (endY-startY)/(endX-startX);
     print(ratio);
     debugString += "\nratio: $ratio";
 
     setState(() {
       byteData = originalByteData.buffer.asUint8List();      
       if(Scan.profile != null){
-        Scan.meters = filamentLeft((Scan.profile.width*ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
-        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width*ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
-        Scan.diameter = (Scan.profile.width*ratio).round();
+        Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
+        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
+        Scan.diameter = (Scan.profile.width/ratio).round();
       }
+      img.Image rectangleConversion = img.decodeImage(byteData);
+      rectImage = img.encodePng(img.drawRect(rectangleConversion, startX.toInt(), startY.toInt(), endX.toInt(), endY.toInt(), img.getColor(255, 0, 0),));
+      // img.drawRect(dst, x1, y1, x2, y2, color)
     });
 
     
@@ -134,7 +140,7 @@ class CameraState extends State<Camera> {
 
   Future<List> recognize(List imageList) async {
     print("recognize");
-    final interpreter = await tfl.Interpreter.fromAsset('v6-model.tflite');
+    final interpreter = await tfl.Interpreter.fromAsset('v7-model.tflite');
     var input = imageList.reshape([1,224,224,3]);
     List output = List(1*4).reshape([1,4]);
     interpreter.run(input, output);
@@ -175,20 +181,13 @@ class CameraState extends State<Camera> {
     print("postconvert");
     debugString += "\npost convert";
     int index = 0;
-    for(var coordinate in output[0]){
-      if((index + 1) % 2 == 0){
-        setState(() {
-          finalCoordinates.add(coordinate*width);
-        });
-      }
-      else{
-        setState(() {
-          finalCoordinates.add(coordinate*height);
-        });
-      }
-      index++;
-      // print(coordinate);
-    }
+    
+    finalCoordinates.add(output[0][0]*width);
+    finalCoordinates.add(output[0][1]*height);
+    finalCoordinates.add(output[0][2]*width);
+    finalCoordinates.add(output[0][3]*height);
+        
+    print(finalCoordinates);
   }
 
 
@@ -308,6 +307,9 @@ class CameraState extends State<Camera> {
 
 
 
+
+
+
   @override 
   Widget build(BuildContext context){
     final size = MediaQuery.of(context).size;
@@ -403,7 +405,7 @@ class CameraState extends State<Camera> {
                           child: Column(
                             children: [
 
-                              _image == null 
+                              rectImage == null 
 
                               ?
 
@@ -475,9 +477,9 @@ class CameraState extends State<Camera> {
                                       });
                                       scanImage(imageFile);
                                       if(Scan.profile != null){
-                                        Scan.meters = filamentLeft((Scan.profile.width*ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
-                                        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width*ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
-                                        Scan.diameter = (Scan.profile.width*ratio).round();
+                                        Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
+                                        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
+                                        Scan.diameter = (Scan.profile.width/ratio).round();
                                       }
                                       analytics.logEvent(name: "scan");
                                       if(optInList[0].optIn == 2){
@@ -494,7 +496,10 @@ class CameraState extends State<Camera> {
 
                               Column(
                                 children: [
-                                  Image.file(_image, width: MediaQuery.of(context).size.width *.5,),
+                                  RotatedBox(
+                                    quarterTurns: 1,
+                                    child: Image.memory(rectImage, width: (MediaQuery.of(context).size.width *.5)*2,),
+                                  ),
                                   SizedBox(height:3),
                                   InkWell(
                                     child: Container(
@@ -507,7 +512,7 @@ class CameraState extends State<Camera> {
                                     ),
                                     onTap: () async {
                                       setState(() {
-                                        _image = null;
+                                        rectImage = null;
                                       });
                                     },
                                   ),
@@ -552,9 +557,9 @@ class CameraState extends State<Camera> {
                                       }
                                     });
                                     if(byteData != null){
-                                        Scan.meters = filamentLeft((Scan.profile.width*ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
-                                        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width*ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
-                                        Scan.diameter = (Scan.profile.width*ratio).round();
+                                        Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
+                                        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
+                                        Scan.diameter = (Scan.profile.width/ratio).round();
                                       }
                                   },
                                 )
