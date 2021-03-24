@@ -111,7 +111,12 @@ class CameraState extends State<Camera> {
     List converted = await preConvert();
     // await recognize(converted);
     await postConvert(await recognize(converted));
-    ratio = (finalCoordinates[3]-finalCoordinates[1])/(finalCoordinates[2]-finalCoordinates[0]);
+    double startX = finalCoordinates[0];
+    double startY = finalCoordinates[1];
+    double endX = finalCoordinates[2];
+    double endY = finalCoordinates[3];
+
+    ratio = ((endY-startY)/(endX-startX));
     print(ratio);
     debugString += "\nratio: $ratio";
 
