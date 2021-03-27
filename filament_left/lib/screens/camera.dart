@@ -46,7 +46,7 @@ class CameraState extends State<Camera> {
   List finalCoordinates = [];
   var memoryImageSize;
   Uint8List byteData;
-  ByteData originalByteData;
+  Uint8List originalByteData;
   bool popUpTriggered = false;
   double ratio;
   CameraController _controller;
@@ -55,7 +55,7 @@ class CameraState extends State<Camera> {
   bool showCapturedPhoto = false;
   File imageFile;
   String debugString = "debug:";
-  var rectImage;
+  Uint8List rectImage;
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
@@ -73,6 +73,7 @@ class CameraState extends State<Camera> {
 
   @override
   void initState() {
+    // precacheImage(AssetImage("assets/example.JPG"), context);
     super.initState();
     _initializeCamera(); 
     DatabaseProviderProfile.db.getProfiles(context).then(
@@ -131,7 +132,7 @@ class CameraState extends State<Camera> {
         Scan.diameter = (Scan.profile.width/ratio).round();
       }
       img.Image rectangleConversion = img.decodeImage(byteData);
-      rectImage = img.encodePng(img.drawRect(rectangleConversion, startX.toInt(), startY.toInt(), endX.toInt(), endY.toInt(), img.getColor(255, 0, 0),));
+      rectImage = img.encodePng(img.drawRect(rectangleConversion, startX.toInt(), startY.toInt(), endX.toInt(), endY.toInt(), img.getColor(29, 204, 183)));
       // img.drawRect(dst, x1, y1, x2, y2, color)
     });
 
@@ -140,7 +141,8 @@ class CameraState extends State<Camera> {
 
   Future<List> recognize(List imageList) async {
     print("recognize");
-    final interpreter = await tfl.Interpreter.fromAsset('v7-model.tflite');
+    imageCache.clear();
+    final interpreter = await tfl.Interpreter.fromAsset('v8-model.tflite');
     var input = imageList.reshape([1,224,224,3]);
     List output = List(1*4).reshape([1,4]);
     interpreter.run(input, output);
@@ -151,19 +153,17 @@ class CameraState extends State<Camera> {
 
 
   Future<List> preConvert() async{
-    // print("preconvert");
+    print("preconvert");
     debugString += "\npreconvert";
     Future<img.Image> getUiImage() async {
-      final ByteData assetImageByteData = await rootBundle.load(_path);
+      final Uint8List assetImageByteData = await _image.readAsBytes();
       originalByteData = assetImageByteData;
 
-      img.Image baseSizeImage = img.decodeImage(assetImageByteData.buffer.asUint8List());
+      img.Image baseSizeImage = img.decodeImage(assetImageByteData);
       img.Image resizeImage = img.copyResize(baseSizeImage, height: 224, width: 224);
       return resizeImage;
     }
-
     img.Image image = await getUiImage();
-
     List oldArray = image.getBytes();
     List newArray = [];
     int index = 0;
@@ -259,7 +259,7 @@ class CameraState extends State<Camera> {
           children:[
             Container(
               child: SingleChildScrollView(
-                child: Text("If you are willing to share your photos from your scan please opt in. These photos will be used to help train future models. This has no cost to you and helps the model a ton!(you can change this option in settings if you need too)", style: basicBlack,),
+                child: Text("By continuing to use the scan feature you agree and understand that we will use your scanned photos to help train the future models. We do collect this data solely for the puprose of improving scanning, once the photo has been evaluated we will remove it from the database. This photo is not attached to your idenity at all, it is completely anonymous. Thanks for your understanding! You can opt out any time in settings!", style: basicBlack,),
               )
             ),
           ]
@@ -268,22 +268,25 @@ class CameraState extends State<Camera> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              OptIn optIn = OptIn(
-                id: 1,
-                optIn: 1,
-              );
-              DatabaseProviderOptIn.db.update(optIn).then(
-                (measureList) {
-                  BlocProvider.of<OptInBloc>(context).add(UpdateOptIn(0, optIn));
-                },
-              );
+              analytics.logEvent(name: "optIn", parameters: {"optedIn": "false"});
+              // OptIn optIn = OptIn(
+              //   id: 1,
+              //   optIn: 1,
+              // );
+              // DatabaseProviderOptIn.db.update(optIn).then(
+              //   (measureList) {
+              //     BlocProvider.of<OptInBloc>(context).add(UpdateOptIn(0, optIn));
+              //   },
+              // );
               Navigator.pop(context);
-              Future.delayed(Duration.zero, () => betaPopUp(context));
+              Navigator.pop(context);
+              // Future.delayed(Duration.zero, () => betaPopUp(context));
             },
-            child: Text("Don't share", style: basicBlack,),
+            child: Text("Cancel", style: basicBlack,),
           ),
           TextButton(
             onPressed: () {
+              analytics.logEvent(name: "optIn", parameters: {"optedIn": "true"});
               OptIn optIn = OptIn(
                 id: 1,
                 optIn: 2,
@@ -326,11 +329,13 @@ class CameraState extends State<Camera> {
           //   Scan.diameter = null;
           // }
           if(optInList.length != 0){
-            if(optInList[0].optIn == 0 && !popUpTriggered){
-              print(optInList);
-              print(optInList[0].optIn);
-              popUpTriggered = true;
-              Future.delayed(Duration.zero, () => firstScanPopUp(context, optInList));
+            if(optInList[0].optIn == 0 || optInList[0].optIn == 1){
+              if(!popUpTriggered){
+                print(optInList);
+                print(optInList[0].optIn);
+                popUpTriggered = true;
+                Future.delayed(Duration.zero, () => firstScanPopUp(context, optInList));
+              }
             }
 
 
@@ -362,7 +367,7 @@ class CameraState extends State<Camera> {
                 return Container(
                   child: Column(
                     children: [
-                      SizedBox(height: CurrentDevice.hasNotch ? 36 : 10),
+                      SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
                       
                       Container(
                         width: MediaQuery.of(context).size.width,
@@ -475,17 +480,20 @@ class CameraState extends State<Camera> {
                                       setState(() {
                                         imageFile = tempFile;
                                       });
-                                      scanImage(imageFile);
+                                      await scanImage(imageFile);
                                       if(Scan.profile != null){
                                         Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
                                         Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
                                         Scan.diameter = (Scan.profile.width/ratio).round();
                                       }
                                       analytics.logEvent(name: "scan");
-                                      if(optInList[0].optIn == 2){
-                                        // upload file
-                                        uploadFile(_image);
-                                      }
+                                      // if(optInList[0].optIn == 2){
+                                      // upload file
+                                      uploadFile(_image, "images");
+                                      uploadFile(await getImageFileFromAssets(rectImage), "output");
+                                      
+
+                                      // }
                                     },
                                   ),
                                 ]

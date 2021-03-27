@@ -17,7 +17,7 @@ class HelpState extends State<Help> {
       body: Container(
         child: Column(
           children: [
-            SizedBox(height: CurrentDevice.hasNotch ? 36 : 10),
+            SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
             Container(
               width: MediaQuery.of(context).size.width,
               child: Row(

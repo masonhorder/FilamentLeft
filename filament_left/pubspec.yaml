@@ -17,6 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
+androidX: true
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -70,7 +71,7 @@ flutter:
   assets:
     - assets/help-diam.png
     - assets/help-circumference.png
-    - assets/v7-model.tflite
+    - assets/v8-model.tflite
     - assets/example.JPG
 
   # An image asset can refer to one or more resolution-specific "variants", see

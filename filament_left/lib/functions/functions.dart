@@ -1,7 +1,12 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
+// import 'package:flutter/services.dart';
 import 'package:path/path.dart' as Path;  
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path_provider/path_provider.dart';
+// import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as img;
 
 
 
@@ -100,11 +105,11 @@ metersToGrams(num meters, String filamentType, bool filament){
 
 
 
-Future<String> uploadFile(File _image) async {
+Future<String> uploadFile(File _image, String path) async {
   
   Reference storageReference = FirebaseStorage.instance
       .ref()
-      .child('images/${DateTime.now().microsecondsSinceEpoch}.png');
+      .child('$path/${DateTime.now().microsecondsSinceEpoch}.png');
   UploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask;
   print('File Uploaded');
@@ -113,4 +118,14 @@ Future<String> uploadFile(File _image) async {
     returnURL =  fileURL;
   });
   return returnURL;
+}
+
+
+Future<File> getImageFileFromAssets(Uint8List byteData) async {
+  final tempFile =
+      File("${(await getTemporaryDirectory()).path}/photo.png");
+  final file = await tempFile.writeAsBytes(
+    byteData.toList()
+  );
+  return file;
 }

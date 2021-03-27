@@ -1,3 +1,4 @@
+import 'package:filament_left/analytics.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/editParams.dart';
 import 'package:filament_left/style/formStyle.dart';
@@ -29,6 +30,7 @@ class PresetProfilesState extends State<PresetProfiles>{
           IconButton(
             icon: Icon(Icons.add), 
             onPressed: () {
+              analytics.logEvent(name: "addPreset", parameters: {"brand": preset[0]});
               setState(() {
                 EditForm.nameController.text = preset[0];
                 EditForm.name = preset[0];
@@ -63,7 +65,7 @@ class PresetProfilesState extends State<PresetProfiles>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: CurrentDevice.hasNotch ? 36 : 10),
+              SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children:[
@@ -125,6 +127,7 @@ class PresetProfilesState extends State<PresetProfiles>{
                           setState(() {
                             presets = similarPresets;
                           });
+                          analytics.logEvent(name: "searchPreset");
                         }
                       },
                     ),

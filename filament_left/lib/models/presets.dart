@@ -15,5 +15,15 @@ class Presets{
       82,
       55,
     ],
+    [
+      "Prusament",
+      98,
+      69,
+    ],
+    [
+      "Overture",
+      98,
+      59,
+    ],
   ];
 }

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:filament_left/Screens/home.dart';
 import 'package:filament_left/Screens/settings.dart';
 import 'package:filament_left/bloc/measureBloc.dart';
@@ -35,6 +36,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    precacheImage(AssetImage("assets/example.JPG"), context);
     _fetch();
   }
 
@@ -68,8 +70,13 @@ class _MyAppState extends State<MyApp> {
       "x86_64",
     ];
     // if(getDevice() is in )
-    bool bottomNotch = iphones.contains(await getDevice());
-    String device = await getDevice();
+    bool bottomNotch = false;
+    String device;
+    if(Platform.isIOS){
+      bottomNotch = iphones.contains(await getDevice());
+      device = await getDevice();
+    }
+    
     setState(() {
       CurrentDevice.hasNotch = bottomNotch;
       CurrentDevice.device = device;
@@ -117,6 +124,7 @@ class _MyAppState extends State<MyApp> {
         home: DefaultTabController(
             
           length: 2,
+          // length: 3,
           child: new Scaffold(
             body: TabBarView(
               children: [

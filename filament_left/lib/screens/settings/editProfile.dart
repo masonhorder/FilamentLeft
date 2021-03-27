@@ -1,4 +1,5 @@
 import 'package:filament_left/Screens/settings/help.dart';
+import 'package:filament_left/analytics.dart';
 import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/db/database_provider.dart';
 import 'package:filament_left/events/profileEvent.dart';
@@ -49,7 +50,7 @@ class EditState extends State<Edit>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: CurrentDevice.hasNotch ? 36 : 10),
+              SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
 
               Container(
                 width: MediaQuery.of(context).size.width,
@@ -79,6 +80,7 @@ class EditState extends State<Edit>{
                           children: [
                             InkWell(
                               onTap: (){
+                                analytics.logEvent(name: "lookAtPresets",);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => PresetProfiles()),
@@ -313,6 +315,7 @@ class EditState extends State<Edit>{
                                     // EditForm.inner = null;
                                     // EditForm.filament = null;
                                     // EditForm.filamentType = null;
+                                    analytics.logEvent(name: "saveProfile", parameters: {"isEditing": ActiveProfile.isEditing.toString()});
                                     Navigator.pop(context);
                                   }
                                 },
@@ -344,6 +347,7 @@ class EditState extends State<Edit>{
                                         DeleteProfile(ActiveProfile.index),
                                       );
                                     });
+                                    analytics.logEvent(name: "deleteProfile");
                                     Navigator.pop(context);
                                   },
                                   child: Container(

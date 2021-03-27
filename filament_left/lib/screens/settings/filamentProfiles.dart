@@ -39,7 +39,7 @@ class ProfilesState extends State<Profiles> {
           builder: (context, profileList) {
             return Column(
               children: [
-                SizedBox(height: CurrentDevice.hasNotch ? 36 : 10),
+                SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
                 Container(
                   width: MediaQuery.of(context).size.width,
                   child: Row(

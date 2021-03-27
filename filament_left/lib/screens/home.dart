@@ -246,7 +246,7 @@ class HomeState extends State<Home> {
 
                   return Column(
                     children: [
-                      SizedBox(height: CurrentDevice.hasNotch ? 36 : 10),
+                      SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
 
                       Text("Filament Left", style: pageHeader,),
                       SizedBox(height: 10),
@@ -459,6 +459,7 @@ class HomeState extends State<Home> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
+            analytics.logEvent(name: "openScanner");
             Navigator.push(
               context,
               MaterialPageRoute(

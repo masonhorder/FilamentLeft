@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.filament_left">
+    package="com.masonhorder.filamentleft">
    <application
         android:label="filament_left"
         android:icon="@mipmap/ic_launcher">

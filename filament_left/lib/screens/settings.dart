@@ -1,5 +1,6 @@
 import 'package:filament_left/Screens/settings/filamentProfiles.dart';
 import 'package:filament_left/Screens/settings/help.dart';
+import 'package:filament_left/analytics.dart';
 import 'package:filament_left/bloc/measureBloc.dart';
 import 'package:filament_left/bloc/optInBloc.dart';
 import 'package:filament_left/db/database_provider.dart';
@@ -59,7 +60,7 @@ class SettingsState extends State<Settings> {
               return Container(
                 child: Column(
                   children: [
-                    SizedBox(height: CurrentDevice.hasNotch ? 36 : 10),
+                    SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
 
                     Text("Settings", style: pageHeader,),
                     SizedBox(height: 15),
@@ -249,6 +250,7 @@ class SettingsState extends State<Settings> {
                                               BlocProvider.of<OptInBloc>(context).add(SetOptIns(optInList));
                                             },
                                           );
+                                          analytics.logEvent(name: "optIn", parameters: {"optedIn": value.toString()});
                                           
                                         }
                                       ),
@@ -327,6 +329,10 @@ class SettingsState extends State<Settings> {
                                 )
                               )
                             ),
+                            SizedBox(height:30),
+                            Text("Check out our insta and twitter: @filamentleft"),
+                            SizedBox(height:10),
+                            Text("Created by: Mason Horder(@mason_horder) and Dennis Zax", textAlign: TextAlign.center,)
                           ]
                         ),
                       )
