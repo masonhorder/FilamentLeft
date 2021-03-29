@@ -90,9 +90,9 @@ class EditState extends State<Edit>{
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children:[
-                                    Text("Common Spool Presets"),
+                                    Text("Common Spool Presets", style: basicLargeBlack,),
                                     SizedBox(width: 7),
-                                    Icon(Icons.open_in_new, size: 18,)
+                                    Icon(Icons.open_in_new, size: 40,)
                                   ]
                                 )
                               ),

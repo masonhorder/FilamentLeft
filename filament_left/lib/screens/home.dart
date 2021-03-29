@@ -4,6 +4,7 @@ import 'package:filament_left/analytics.dart';
 import 'package:filament_left/bloc/measureBloc.dart';
 import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/db/database_provider.dart';
+import 'package:filament_left/elements/spoolHelp.dart';
 import 'package:filament_left/events/measureEvent.dart';
 import 'package:filament_left/events/profileEvent.dart';
 import 'package:filament_left/functions/functions.dart';
@@ -45,9 +46,23 @@ class HomeState extends State<Home> {
         children: [
 
           Container(
-            margin: EdgeInsets.symmetric(horizontal:30,),
+            // padding: EdgeInsets.only(left:30, right: 30, bottom: 8),
+            margin: EdgeInsets.symmetric(horizontal: 30),
             alignment: Alignment.centerLeft,
-            child: Text("Inner Diameter of The Spool(mm):", style: basicMediumBlack),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child:Text("Inner Diameter of the spool(mm):", style: basicMediumBlack,),
+                ),
+                IconButton(icon: Icon(Icons.help), onPressed: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Help()),
+                  );
+                })
+              ]
+            ),
           ),
           SizedBox(height: 10),
           Container(
@@ -74,9 +89,23 @@ class HomeState extends State<Home> {
           SizedBox(height: 40),
 
           Container(
-            margin: EdgeInsets.symmetric(horizontal:30,),
+            // padding: EdgeInsets.only(left:30, right: 30, bottom: 8),
+            margin: EdgeInsets.symmetric(horizontal: 30),
             alignment: Alignment.centerLeft,
-            child: Text("Width of The Spool(mm):", style: basicMediumBlack),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child:Text("Width of the Spool(mm):", style: basicMediumBlack,),
+                ),
+                IconButton(icon: Icon(Icons.help), onPressed: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Help()),
+                  );
+                })
+              ]
+            ),
           ),
           SizedBox(height: 10),
           Container(
@@ -192,7 +221,7 @@ class HomeState extends State<Home> {
 
   result(){
     if(CalculateForm.value != ""){
-      return Text(CalculateForm.value, style: basicMediumDarkBlue,);
+      return Text(CalculateForm.value, style: basicLargeBlack,);
     }
     return SizedBox(height: 1);
   }
@@ -249,7 +278,7 @@ class HomeState extends State<Home> {
                       SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
 
                       Text("Filament Left", style: pageHeader,),
-                      SizedBox(height: 10),
+                      SizedBox(height: 30),
                       result(),
                       SizedBox(height: 15),
                       
@@ -265,74 +294,18 @@ class HomeState extends State<Home> {
                                 
                                 
                                 SizedBox(height: 40),
-
-
-                                Container(
-                                  padding: EdgeInsets.only(left:30, right: 30, bottom: 8),
-                                  alignment: Alignment.centerLeft,
-                                  child: Text("Outer ${circumference(CalculateForm.circumference)} of Filament Remaining(mm):", style: basicMediumBlack),
-                                ),
-
-                                Container(
-                                  padding: EdgeInsets.only(left:30, right: 30),
-                                  child: TextFormField(
-                                    keyboardType: TextInputType.number,
-                                    decoration: textInputDecoration.copyWith(hintText: 'outer ${circumference(CalculateForm.circumference).toLowerCase()}'),
-                                    validator: (val) {
-                                      if (val.isEmpty || val == "" || val == null) {
-                                        return 'this value is required';
-                                      }
-                                      if(int.parse(val) == null) {
-                                        return 'integer only';
-                                      }
-                                      return null;
-                                    },
-                                    onChanged: (val) {
-                                      setState(() => CalculateForm.outer = int.parse(val));
-                                    },
-                                  ),
-                                ),
-
-
-
-                                SizedBox(height:30),
-
-
-                                // Container(
-                                //   padding: EdgeInsets.all(2),
-                                //   margin: EdgeInsets.symmetric(horizontal: 30),
-                                //   decoration: BoxDecoration(
-                                //     border: Border(
-                                //       bottom: BorderSide(color: darkBlue, width: 2.3),
-                                //       top: BorderSide(color: darkBlue, width: 2.3),
-                                //       right: BorderSide(color: darkBlue, width: 2.3),
-                                //       left: BorderSide(color: darkBlue, width: 2.3),
-                                //     ),
-                                //     borderRadius: BorderRadius.circular(10),
-                                //     color: Colors.white,
-                                //   ),
-                                //   child:Row(
-                                //     mainAxisAlignment: MainAxisAlignment.center,
-                                //     children:[
-                                //       Text("Use Prestet Profile: ", style: basicBlack,),
-                                //       Switch(
-                                //         value: useProfile, 
-                                //         onChanged: (val){
-                                //           setState(() {
-                                //             useProfile = val;
-                                //           });
-                                //         }
-                                //       ),
-                                //     ]
-                                //   ),
-                                // ),
-
-                                SizedBox(height: 20),
-                                // formExtension(profileList, useProfile),
                                 Container(
                                   margin: EdgeInsets.symmetric(horizontal: 30),
                                   alignment: Alignment.centerLeft,
-                                  child:Text("Profile:", style: basicMediumBlack,),
+                                  child:Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Filament Spool Type:", style: basicMediumBlack,),
+                                      IconButton(icon: Icon(Icons.help), onPressed: (){
+                                        return spoolHelp(context);
+                                      })
+                                    ]
+                                  ),
                                 ),
                                 SizedBox(height:10),
                                 Container(
@@ -352,17 +325,17 @@ class HomeState extends State<Home> {
                                     isExpanded:true,
                                     iconEnabledColor: darkBlue,
                                     dropdownColor: Colors.white,
-                                    validator: (value) => value == null ? 'Profile Required' : null,
+                                    validator: (value) => value == null ? 'Spool Required' : null,
                                     value: CalculateForm.profile,
                                     hint: Text(
-                                      'Select a Profile',
+                                      'Select a Spool',
                                       style: basicDarkBlue,
                                     ),
                                     items: dropDownList.map((var value) {
                                       if(value == "other"){
                                         return new DropdownMenuItem<String>(
                                           value: "other",
-                                          child: new Text("Custom", style: basicBlack, overflow: TextOverflow.ellipsis,),
+                                          child: new Text("Enter Values", style: basicBlack, overflow: TextOverflow.ellipsis,),
                                         );
                                       }
                                       return new DropdownMenuItem<String>(
@@ -392,58 +365,77 @@ class HomeState extends State<Home> {
                                         
                                       }
                                       setState((){
-                                          print(value);
-                                          CalculateForm.profile = value;
-                                        });
+                                        print(value);
+                                        CalculateForm.profile = value;
+                                      });
+                                      if(CalculateForm.outer != null){
+                                        CalculateForm.value = "Meters Left(approx.): ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
+                                      }
                                       
 
                                     },
                                   )
                                 ),
+                                
+                                SizedBox(height: 40),
+
+                                Container(
+                                  // padding: EdgeInsets.only(left:30, right: 30, bottom: 8),
+                                  margin: EdgeInsets.symmetric(horizontal: 30),
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        child:Text("Outer ${circumference(CalculateForm.circumference)} of Filament Remaining(mm):", style: basicMediumBlack,),
+                                      ),
+                                      IconButton(icon: Icon(Icons.help), onPressed: (){
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => Help()),
+                                        );
+                                      })
+                                    ]
+                                  ),
+                                ),
+
+                                Container(
+                                  padding: EdgeInsets.only(left:30, right: 30),
+                                  child: TextFormField(
+                                    keyboardType: TextInputType.number,
+                                    decoration: textInputDecoration.copyWith(hintText: 'outer ${circumference(CalculateForm.circumference).toLowerCase()}'),
+                                    validator: (val) {
+                                      if (val.isEmpty || val == "" || val == null) {
+                                        return 'this value is required';
+                                      }
+                                      if(int.parse(val) == null) {
+                                        return 'integer only';
+                                      }
+                                      return null;
+                                    },
+                                    onChanged: (val) {
+                                      setState(() => CalculateForm.outer = int.parse(val));
+                                      if(CalculateForm.profile != null && useProfile){
+                                        setState(() => CalculateForm.value = "Meters Left: ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g");
+                                      }
+                                    },
+                                  ),
+                                ),
+
                                 SizedBox(height: 40),
                           
                                 extraForm(useProfile),
 
-                                SizedBox(height: 40,),
-
-                                Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: (){
-                                      analytics.logEvent(name: "calculate");
-                                      if (_formKey.currentState.validate()) {
-                                        setState(() {
-                                          CalculateForm.value = "Meters Left(approx.): ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
-                                        });
-                                      }
-                                    },
-                                    child: Container(
-                                      margin: EdgeInsets.only(left:70, right:70,),
-                                      padding: EdgeInsets.only(top: 15, bottom: 15),
-                                      width: MediaQuery.of(context).size.width,
-                                      alignment: Alignment.center,
-                                      
-                                      decoration: BoxDecoration(
-                                        color: darkBlue,
-                                        borderRadius: BorderRadius.circular(10),
-                                        // boxShadow: [
-                                        //   BoxShadow(color: Colors.green, spreadRadius: 3),
-                                        // ],
-                                      ),
-                                      child: Text("Calculate", style: basicWhite,)
-                                    )
-                                  ),
-                                ),
-                                SizedBox(height:10),
-                                InkWell(
-                                  child: Text("Get Help Measuring", style: basicBlack,),
-                                  onTap: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => Help()),
-                                    );
-                                  },
-                                ),
+                                // SizedBox(height:10),
+                                // InkWell(
+                                //   child: Text("Get Help Measuring", style: basicBlack,),
+                                //   onTap: (){
+                                //     Navigator.push(
+                                //       context,
+                                //       MaterialPageRoute(builder: (context) => Help()),
+                                //     );
+                                //   },
+                                // ),
                                 SizedBox(height: 25),
                               ]
                             )

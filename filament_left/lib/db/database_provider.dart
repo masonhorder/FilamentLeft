@@ -81,24 +81,24 @@ class DatabaseProviderProfile {
     });
 
 
-    if(profileList.length == 0){
-      List listOfPresets = [["Hatchbox", 62, 80, 1.75, "PLA"],];
-      for(List preset in listOfPresets){
-        Profile profile = Profile(
-          inner: preset[2],
-          width: preset[1],
-          filamentSize: preset[3],
-          filamentType: preset[4],
-          name: preset[0],
-        );
+    // if(profileList.length == 0){
+    //   List listOfPresets = [["Hatchbox", 62, 80, 1.75, "PLA"],];
+    //   for(List preset in listOfPresets){
+    //     Profile profile = Profile(
+    //       inner: preset[2],
+    //       width: preset[1],
+    //       filamentSize: preset[3],
+    //       filamentType: preset[4],
+    //       name: preset[0],
+    //     );
 
-        DatabaseProviderProfile.db.insert(profile).then(
-          (storeProfile) => BlocProvider.of<ProfileBloc>(context).add(
-            AddProfile(storeProfile),
-          ),
-        );
-      }
-    }
+    //     DatabaseProviderProfile.db.insert(profile).then(
+    //       (storeProfile) => BlocProvider.of<ProfileBloc>(context).add(
+    //         AddProfile(storeProfile),
+    //       ),
+    //     );
+    //   }
+    // }
 
     return profileList;
   }

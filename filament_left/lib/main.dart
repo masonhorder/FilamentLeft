@@ -11,6 +11,7 @@ import 'package:filament_left/models/optIn.dart';
 import 'package:filament_left/models/profiles.dart';
 import 'package:filament_left/screens/spools.dart';
 import 'package:filament_left/style/globals.dart';
+import 'package:filament_left/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
@@ -121,43 +122,7 @@ class _MyAppState extends State<MyApp> {
           accentColor: darkBlue,
           scaffoldBackgroundColor: blue,
         ),
-        home: DefaultTabController(
-            
-          length: 2,
-          // length: 3,
-          child: new Scaffold(
-            body: TabBarView(
-              children: [
-                Home(),
-                // Spools(),
-                Settings(),
-              ],
-            ),
-            bottomNavigationBar: Container(
-              color: Colors.white,
-              padding: CurrentDevice.hasNotch ? EdgeInsets.only(bottom:20) : null,
-              child: new TabBar(
-                tabs: [
-                  Tab(
-                    icon: new Icon(Icons.analytics),
-                  ),
-                  // Tab(
-                  //   icon: new Icon(Icons.show_chart)
-                  // ),
-                  Tab(
-                    icon: new Icon(Icons.settings),
-                  ),
-                ],
-                labelColor: darkBlue,
-                unselectedLabelColor: darkBlue,
-                indicatorSize: TabBarIndicatorSize.label,
-                indicatorPadding: EdgeInsets.all(5.0),
-                indicatorColor: darkBlue,
-              )
-              
-            ),
-          ),
-        ),
+        home: Wrapper()
       ),
     );
   }

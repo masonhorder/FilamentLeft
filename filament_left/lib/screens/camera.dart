@@ -142,7 +142,7 @@ class CameraState extends State<Camera> {
   Future<List> recognize(List imageList) async {
     print("recognize");
     imageCache.clear();
-    final interpreter = await tfl.Interpreter.fromAsset('v8-model.tflite');
+    final interpreter = await tfl.Interpreter.fromAsset('v9-model.tflite');
     var input = imageList.reshape([1,224,224,3]);
     List output = List(1*4).reshape([1,4]);
     interpreter.run(input, output);
@@ -506,7 +506,7 @@ class CameraState extends State<Camera> {
                                 children: [
                                   RotatedBox(
                                     quarterTurns: 1,
-                                    child: Image.memory(rectImage, width: (MediaQuery.of(context).size.width *.5)*2,),
+                                    child: Image.memory(byteData, width: (MediaQuery.of(context).size.width *.5)*2,),
                                   ),
                                   SizedBox(height:3),
                                   InkWell(
