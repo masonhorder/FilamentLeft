@@ -6,6 +6,8 @@ import 'package:filament_left/analytics.dart';
 import 'package:filament_left/bloc/optInBloc.dart';
 import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/db/database_provider.dart';
+import 'package:filament_left/elements/buyMorePopUp.dart';
+import 'package:filament_left/elements/progressBar.dart';
 import 'package:filament_left/events/optInEvent.dart';
 import 'package:filament_left/events/profileEvent.dart';
 import 'package:filament_left/functions/functions.dart';
@@ -506,7 +508,7 @@ class CameraState extends State<Camera> {
                                 children: [
                                   RotatedBox(
                                     quarterTurns: 1,
-                                    child: Image.memory(byteData, width: (MediaQuery.of(context).size.width *.5)*2,),
+                                    child: Image.memory(rectImage, width: (MediaQuery.of(context).size.width *.5)*2,),
                                   ),
                                   SizedBox(height:3),
                                   InkWell(
@@ -530,48 +532,51 @@ class CameraState extends State<Camera> {
 
                               SizedBox(height:10),
 
-                              Container(
-                                padding: EdgeInsets.all(9),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: whiteFontColor,
-                                ),
-                                width: MediaQuery.of(context).size.width*.7,
-                                child: DropdownButtonFormField<String>(
-                                  isExpanded:true,
-                                  iconEnabledColor: darkBlue,
-                                  dropdownColor: Colors.white,
-                                  validator: (value) => value == null ? 'Profile Required' : null,
-                                  value: Scan.profileName,
-                                  hint: Text(
-                                    'Select a Profile',
-                                    style: basicDarkBlue,
+                              profileList.length == 0 ?
+                                Text("Atleast 1 Spool Type is required(add one in settings tab under \"Spools\")", style: basicBlack, textAlign: TextAlign.center,)
+                                :
+                                Container(
+                                  padding: EdgeInsets.all(9),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: whiteFontColor,
                                   ),
-                                  items: profileList.map((var value) {
-                                    return new DropdownMenuItem<String>(
-                                      
-                                      value: value.id.toString(),
-                                      child: new Text("${value.name} - ${value.filamentSize}mm ${value.filamentType}", style: basicDarkBlue, overflow: TextOverflow.ellipsis,),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState((){
-                                      // print(value);
-                                      Scan.profileName = value;
-                                      for(var document in profileList){
-                                        if(document.id.toString() == value){
-                                          Scan.profile = document;
+                                  width: MediaQuery.of(context).size.width*.7,
+                                  child: DropdownButtonFormField<String>(
+                                    isExpanded:true,
+                                    iconEnabledColor: darkBlue,
+                                    dropdownColor: Colors.white,
+                                    validator: (value) => value == null ? 'Spool Type Required' : null,
+                                    value: Scan.profileName,
+                                    hint: Text(
+                                      'Select a Spool Type',
+                                      style: basicDarkBlue,
+                                    ),
+                                    items: profileList.map((var value) {
+                                      return new DropdownMenuItem<String>(
+                                        
+                                        value: value.id.toString(),
+                                        child: new Text("${value.name} - ${value.filamentSize}mm ${value.filamentType}", style: basicDarkBlue, overflow: TextOverflow.ellipsis,),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState((){
+                                        // print(value);
+                                        Scan.profileName = value;
+                                        for(var document in profileList){
+                                          if(document.id.toString() == value){
+                                            Scan.profile = document;
+                                          }
                                         }
-                                      }
-                                    });
-                                    if(byteData != null){
-                                        Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
-                                        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
-                                        Scan.diameter = (Scan.profile.width/ratio).round();
-                                      }
-                                  },
-                                )
-                              ),
+                                      });
+                                      if(byteData != null){
+                                          Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
+                                          Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
+                                          Scan.diameter = (Scan.profile.width/ratio).round();
+                                        }
+                                    },
+                                  )
+                                ),
 
 
                               
@@ -610,6 +615,30 @@ class CameraState extends State<Camera> {
           Text("Grams Left: ${Scan.grams}g", style: basicMediumDarkBlue,),
           Text("Predicted Diameter: ${Scan.diameter}mm", style: basicSmallBlack,),
           Text("Predicted Circumference: ${Scan.diameter*3.14}mm", style: basicSmallBlack,),
+          progressBar(context, Scan.grams),
+          SizedBox(height: 15,),
+          InkWell(
+            onTap: (){
+              buyMorePopUp(context);
+            }, 
+            child: Container(
+              padding: EdgeInsets.all(10),
+              width: 140,
+              decoration: BoxDecoration(
+                color: getColor(Scan.grams),
+                borderRadius: BorderRadius.circular(10)
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Buy More", style: basicWhite,),
+                  SizedBox(width:8),
+                  Icon(Icons.open_in_new, color: whiteFontColor, size: 18,)
+                ],
+              ),
+            )
+          ),
+
         ],
       );
     }

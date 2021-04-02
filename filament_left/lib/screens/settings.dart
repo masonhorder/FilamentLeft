@@ -102,7 +102,7 @@ class SettingsState extends State<Settings> {
                                   children: [
                                     Container(
                                       margin: EdgeInsets.only(left:40),
-                                      child:Text("Profiles", style: basicLargeDarkBlue,),
+                                      child:Text("Spools", style: basicLargeDarkBlue,),
                                     ),
                                     Container(
                                       width:50,
@@ -308,6 +308,7 @@ class SettingsState extends State<Settings> {
                               onTap: () async {
                                 website();
                               },
+                              
                               child: Container(
                                 height: 40,
                                 decoration: BoxDecoration(

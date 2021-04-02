@@ -7,4 +7,5 @@ class CalculateForm{
   static String filamentType;
   static String profile;
   static bool circumference = false;
+  static int grams;
 }

@@ -19,9 +19,27 @@ class Edit extends StatefulWidget{
 }
 
 class EditState extends State<Edit>{
+  @override
+  void initState() {
+    super.initState();
+    if(ActiveProfile.profile != null){
+      if(EditForm.nameController.text != ActiveProfile.profile.name){
+        EditForm.nameController.text = ActiveProfile.profile.name;
+      }
+      if(EditForm.innerController.text != ActiveProfile.profile.inner.toString()){
+        EditForm.innerController.text = ActiveProfile.profile.inner.toString();
+      }
+      if(EditForm.widthController.text != ActiveProfile.profile.width.toString()){
+        EditForm.widthController.text = ActiveProfile.profile.width.toString();
+      }
+    }
+  }
 
   final _formKey = GlobalKey<FormState>();
   var validForm = false;
+  var profileName;
+  var profileInner;
+  var profileWidth;
 
 
 
@@ -38,11 +56,9 @@ class EditState extends State<Edit>{
 
   @override
   Widget build(BuildContext context) {
-    if(ActiveProfile.profile != null){
-      EditForm.nameController.text = ActiveProfile.profile.name;
-      EditForm.innerController.text = ActiveProfile.profile.inner.toString();
-      EditForm.widthController.text = ActiveProfile.profile.width.toString();
-    }
+    
+    
+
     return KeyboardDismisser(
       gestures: [GestureType.onTap, GestureType.onPanUpdateDownDirection],
       child: Scaffold(
@@ -107,6 +123,7 @@ class EditState extends State<Edit>{
                             Container(
                               padding: EdgeInsets.only(left:30, right: 30),
                               child: TextFormField(
+                                // initialValue: ActiveProfile.profile.name,
                                 controller: EditForm.nameController,
                                 decoration: textInputDecoration.copyWith(hintText: 'name'),
                                 validator: (val) {
@@ -117,7 +134,7 @@ class EditState extends State<Edit>{
                                   return null;
                                 },
                                 onChanged: (val) {
-                                  setState(() => EditForm.name = val);
+                                  setState(() => profileName = val);
                                   
                                 },
                               ),
@@ -134,6 +151,7 @@ class EditState extends State<Edit>{
                             Container(
                               padding: EdgeInsets.only(left:30, right: 30),
                               child: TextFormField(
+                                // initialValue: ActiveProfile.profile.inner.toString(),
                                 controller: EditForm.innerController,
                                 keyboardType: TextInputType.number,
                                 decoration: textInputDecoration.copyWith(hintText: 'inner diameter'),
@@ -147,7 +165,7 @@ class EditState extends State<Edit>{
                                   return null;
                                 },
                                 onChanged: (val) {
-                                  setState(() => EditForm.inner = int.parse(val));
+                                  setState(() => profileInner = int.parse(val));
                                   
                                 },
                               ),
@@ -164,6 +182,7 @@ class EditState extends State<Edit>{
                             Container(
                               padding: EdgeInsets.only(left:30, right: 30),
                               child: TextFormField(
+                                // initialValue: ActiveProfile.profile.wudth.toString(),
                                 controller: EditForm.widthController,
                                 keyboardType:  TextInputType.number,
                                 decoration: textInputDecoration.copyWith(hintText: 'width of the spool'),
@@ -177,7 +196,7 @@ class EditState extends State<Edit>{
                                   return null;
                                 },
                                 onChanged: (val) {
-                                  setState(() => EditForm.width = int.parse(val));
+                                  setState(() => profileWidth = int.parse(val));
                                   
                                 },
                               ),
@@ -293,9 +312,9 @@ class EditState extends State<Edit>{
                                     }
                                     else{
                                       Profile profile = Profile(
-                                        name: EditForm.name,
-                                        inner: EditForm.inner,
-                                        width: EditForm.width,
+                                        name: profileName,
+                                        inner: profileInner,
+                                        width: profileWidth,
                                         filamentSize: EditForm.filament ? 2.85 : 1.75,
                                         filamentType: EditForm.filamentType,
                                       );

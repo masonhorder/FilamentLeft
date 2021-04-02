@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 // import 'package:flutter/services.dart';
+import 'package:filament_left/style/globals.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as Path;  
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -129,3 +131,14 @@ Future<File> getImageFileFromAssets(Uint8List byteData) async {
   );
   return file;
 }
+
+
+getColor(int grams){
+    if(grams < 100){
+      return red;
+    }
+    else if(grams < 225){
+      return Colors.orange;
+    }
+    return darkBlue;
+  }
