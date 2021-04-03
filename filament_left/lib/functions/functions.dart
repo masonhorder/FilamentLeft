@@ -9,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
+import 'package:url_launcher/url_launcher.dart';
 
 
 
@@ -134,11 +135,21 @@ Future<File> getImageFileFromAssets(Uint8List byteData) async {
 
 
 getColor(int grams){
-    if(grams < 100){
-      return red;
-    }
-    else if(grams < 225){
-      return Colors.orange;
-    }
-    return darkBlue;
+  if(grams < 100){
+    return red;
   }
+  else if(grams < 225){
+    return Colors.orange;
+  }
+  return darkBlue;
+}
+
+
+
+openLink(String url) async {
+  try{
+    await launch(url);
+  } on Exception catch (_) {
+    throw 'Could not launch $url';
+  }
+}

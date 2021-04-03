@@ -256,6 +256,9 @@ class HomeState extends State<Home> {
           SizedBox(height: 15,),
           InkWell(
             onTap: (){
+              BuyMore.brand = CalculateForm.profileName;
+              BuyMore.material = CalculateForm.filamentType;
+              BuyMore.size = CalculateForm.filament ? 2.85 : 1.75;
               buyMorePopUp(context);
             }, 
             child: Container(
@@ -412,6 +415,7 @@ class HomeState extends State<Home> {
                                             CalculateForm.inner = profile.inner;
                                             CalculateForm.width = profile.width;
                                             CalculateForm.filamentType = profile.filamentType;
+                                            CalculateForm.profileName = profile.name;
                                           }
                                         }
                                         setState(() {

@@ -8,4 +8,5 @@ class CalculateForm{
   static String profile;
   static bool circumference = false;
   static int grams;
+  static String profileName;
 }

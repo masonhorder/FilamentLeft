@@ -619,6 +619,9 @@ class CameraState extends State<Camera> {
           SizedBox(height: 15,),
           InkWell(
             onTap: (){
+              BuyMore.brand = Scan.profileName;
+              BuyMore.material = Scan.profile.filamentType;
+              BuyMore.size = Scan.profile.filamentSize;
               buyMorePopUp(context);
             }, 
             child: Container(
