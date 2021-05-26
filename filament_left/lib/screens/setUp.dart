@@ -1,6 +1,7 @@
 import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/db/database_provider.dart';
 import 'package:filament_left/events/profileEvent.dart';
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/editParams.dart';
 import 'package:filament_left/models/profiles.dart';
@@ -30,10 +31,10 @@ class SetUpState extends State<SetUp>{
                         
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  child: Center(child: Text("Welcome!", style: pageHeader,)),
+                  child: Center(child: Text(langMap()['welc'], style: pageHeader,)),
                 ),
                 SizedBox(height: 70),
-                Text("Welcome to Filament Left. First lets take you through a couple start up steps!", style: basicBlack, textAlign: TextAlign.center,),
+                Text(langMap()['welcTxt'], style: basicBlack, textAlign: TextAlign.center,),
                 SizedBox(height: 30),
                 Image.asset("assets/phone1.png", width: MediaQuery.of(context).size.width*.5,)
               ]
@@ -97,7 +98,7 @@ class SetUpState extends State<SetUp>{
                       style: ElevatedButton.styleFrom(
                         primary: darkBlue, // background
                       ),
-                      child: Text("Next", style: basicSmallBlack,),
+                      child: Text(langMap()['nxt'], style: basicSmallBlack,),
                       onPressed: (){
                         Navigator.push(
                           context,
@@ -161,10 +162,10 @@ class SetUp1State extends State<SetUp1>{
                               
                       Container(
                         width: MediaQuery.of(context).size.width,
-                        child: Center(child: Text("Add Spools", style: pageHeader,)),
+                        child: Center(child: Text(langMap()['addSpools'], style: pageHeader,)),
                       ),
                       SizedBox(height:15),
-                      Text("Spools are used to simplify the process of measuring! Set them up below!", style: basicBlack, textAlign: TextAlign.center,),
+                      Text(langMap()['spoolDesc'], style: basicBlack, textAlign: TextAlign.center,),
                       Expanded(
 
                         child: Column(
@@ -195,8 +196,8 @@ class SetUp1State extends State<SetUp1>{
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Text("${profileList[index].name} - ${profileList[index].filamentSize}mm ${profileList[index].filamentType}", style: basicSmallBlack, overflow: TextOverflow.ellipsis,),
-                                                IconButton(icon: Icon(Icons.edit), onPressed: (){
+                                                Text("${profileList[index].name} - ${profileList[index].filamentSize}${langMap()['mm']} ${profileList[index].filamentType}", style: basicSmallBlack, overflow: TextOverflow.ellipsis,),
+                                                IconButton(color: darkFontColor, icon: Icon(Icons.edit), onPressed: (){
                                                   ActiveProfile.index = profileList.indexOf(profileList[index]);
                                                   ActiveProfile.isEditing = true;
                                                   ActiveProfile.profile = profileList[index];
@@ -229,7 +230,7 @@ class SetUp1State extends State<SetUp1>{
                                             MaterialPageRoute(builder: (context) => Edit()),
                                           );
                                         }, 
-                                        child: Text("Add Another Spool", style: basicWhite)
+                                        child: Text(langMap()['anthSpool'], style: basicWhite)
                                       ),
                                     ]
                                   )
@@ -241,7 +242,7 @@ class SetUp1State extends State<SetUp1>{
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children:[
-                                      Text("No spools set up yet", style: basicDarkBlue,),
+                                      Text(langMap()['noSpool'], style: basicDarkBlue,),
                                       SizedBox(height:10),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
@@ -257,7 +258,7 @@ class SetUp1State extends State<SetUp1>{
                                             MaterialPageRoute(builder: (context) => Edit()),
                                           );
                                         }, 
-                                        child: Text("Add a Spool", style: basicSmallBlack)
+                                        child: Text(langMap()['addSpool'], style: basicSmallBlack)
                                       ),
                                       SizedBox(height:100)
                                     ]
@@ -281,7 +282,7 @@ class SetUp1State extends State<SetUp1>{
                           style: ElevatedButton.styleFrom(
                             primary: darkBlue, // background
                           ),
-                          child: Text("Back", style: basicSmallBlack,),
+                          child: Text(langMap()['bk'], style: basicSmallBlack,),
                           onPressed: (){
                             Navigator.of(context).pop();
                           }
@@ -329,7 +330,7 @@ class SetUp1State extends State<SetUp1>{
                           style: ElevatedButton.styleFrom(
                             primary: darkBlue, // background
                           ),
-                          child: Text("Next", style: basicSmallBlack,),
+                          child: Text(langMap()['nxt'], style: basicSmallBlack,),
                           onPressed: (){
                             if(profileList.length == 0){
                               showDialog(
@@ -337,13 +338,13 @@ class SetUp1State extends State<SetUp1>{
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   backgroundColor: Colors.white,
-                                  title: Text("Continue", style: popUpTitle,), 
+                                  title: Text(langMap()['cont'], style: popUpTitle,), 
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children:[
                                       Container(
                                         child: SingleChildScrollView(
-                                          child: Text("Are you sure you want to continue with out any spools? Having no set up spools does limit the functions of the app. If you dont know your spool dimensions check \"Common Spool Presets\" to see if we have them for you.", style: basicBlack,),
+                                          child: Text(langMap()['uSure'], style: basicBlack,),
                                         )
                                       ),
                                     ]
@@ -358,13 +359,13 @@ class SetUp1State extends State<SetUp1>{
                                           MaterialPageRoute(builder: (context) => SetUp2())
                                         );
                                       },
-                                      child: Text("Continue", style: basicBlack,),
+                                      child: Text(langMap()['cont'], style: basicBlack,),
                                     ),
                                     TextButton(
                                       onPressed: () {
                                         Navigator.pop(context);
                                       },
-                                      child: Text("Go Back", style: basicDarkBlue,),
+                                      child: Text(langMap()['bk'], style: basicDarkBlue,),
                                     ),
                                   ],
                                 ),
@@ -409,7 +410,7 @@ class SetUp2State extends State<SetUp2>{
             SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
             Container(
               width: MediaQuery.of(context).size.width,
-              child: Center(child: Text("Calculating", style: pageHeader,)),
+              child: Center(child: Text(langMap()['calcing'], style: pageHeader,)),
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -420,7 +421,7 @@ class SetUp2State extends State<SetUp2>{
                     SizedBox(height: 70),
                     Image.asset("assets/phone2.png", width: MediaQuery.of(context).size.width*.5,),
                     SizedBox(height: 15),
-                    Text("To calculate Filament Left manually you can use this form to enter the required values get your filament remaining. Use the question marks if you ever need help measuring.", style: basicBlack, textAlign: TextAlign.center,),
+                    Text(langMap()['calcDescription'], style: basicBlack, textAlign: TextAlign.center,),
                   ]
                 ),
               ),
@@ -436,7 +437,7 @@ class SetUp2State extends State<SetUp2>{
                       style: ElevatedButton.styleFrom(
                         primary: darkBlue, // background
                       ),
-                      child: Text("Back", style: basicSmallBlack,),
+                      child: Text(langMap()['bk'], style: basicSmallBlack,),
                       onPressed: (){
                         Navigator.of(context).pop();
                       }
@@ -484,7 +485,7 @@ class SetUp2State extends State<SetUp2>{
                       style: ElevatedButton.styleFrom(
                         primary: darkBlue, // background
                       ),
-                      child: Text("Next", style: basicSmallBlack,),
+                      child: Text(langMap()['nxt'], style: basicSmallBlack,),
                       onPressed: (){
                         Navigator.push(
                           context,
@@ -523,7 +524,7 @@ class SetUp3State extends State<SetUp3>{
             SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
             Container(
               width: MediaQuery.of(context).size.width,
-              child: Center(child: Text("Scanning", style: pageHeader,)),
+              child: Center(child: Text(langMap()['scanning'], style: pageHeader,)),
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -534,7 +535,7 @@ class SetUp3State extends State<SetUp3>{
                     SizedBox(height: 70),
                     Image.asset("assets/phone1-arrow.png", width: MediaQuery.of(context).size.width*.7,),
                     SizedBox(height: 15),
-                    Text("To access scanning press the button where the arrow is pointing to. Then once you are in please understand this is still a work in progress! To use it all you have to do is scan the spool and select a profile!", style: basicBlack, textAlign: TextAlign.center,),
+                    Text(langMap()['scanningDesc'], style: basicBlack, textAlign: TextAlign.center,),
                   ]
                 ),
               ),
@@ -550,7 +551,7 @@ class SetUp3State extends State<SetUp3>{
                       style: ElevatedButton.styleFrom(
                         primary: darkBlue, // background
                       ),
-                      child: Text("Back", style: basicSmallBlack,),
+                      child: Text(langMap()['bk'], style: basicSmallBlack,),
                       onPressed: (){
                         Navigator.of(context).pop();
                       }
@@ -598,7 +599,7 @@ class SetUp3State extends State<SetUp3>{
                       style: ElevatedButton.styleFrom(
                         primary: darkBlue, // background
                       ),
-                      child: Text("Done", style: basicSmallBlack,),
+                      child: Text(langMap()['done'], style: basicSmallBlack,),
                       onPressed: (){
                         Navigator.of(context).pop();
                         Navigator.of(context).pop();

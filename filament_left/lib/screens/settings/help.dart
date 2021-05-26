@@ -1,3 +1,4 @@
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class HelpState extends State<Help> {
                     width: 55,
                     child: IconButton(icon: Icon(Icons.chevron_left, color: darkFontColor,), onPressed: (){ Navigator.pop(context);}, iconSize: 50)
                   ),
-                  Text("Help", style: pageHeader,),
+                  Text(langMap()['help'], style: pageHeader,),
                   SizedBox(width: 55)
                 ]
               ),
@@ -41,10 +42,10 @@ class HelpState extends State<Help> {
                 child: Column(
                   children: [
                     SizedBox(height: MediaQuery.of(context).size.height*.07),
-                    Text("Measuring By Diameter", style: basicLargeDarkBlue,),
+                    Text("${langMap()['msrBy']} ${langMap()['diam']}", style: basicLargeDarkBlue,),
                     Image(image: AssetImage('assets/help-diam.png'), height: 500,),
                     SizedBox(height:120),
-                    Text("Measuring By Circumference", style: basicLargeDarkBlue,),
+                    Text("${langMap()['msrBy']} ${langMap()['circ']}", style: basicLargeDarkBlue,),
                     Image(image: AssetImage('assets/help-circumference.png'), height: 500,),
                   ],
                 )

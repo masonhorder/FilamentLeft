@@ -1,7 +1,5 @@
 import 'package:filament_left/bloc/optInBloc.dart';
-import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/events/optInEvent.dart';
-import 'package:filament_left/events/profileEvent.dart';
 import 'package:filament_left/models/optIn.dart';
 import 'package:filament_left/models/profiles.dart';
 import 'package:filament_left/bloc/measureBloc.dart';
@@ -23,6 +21,7 @@ class DatabaseProviderProfile {
   static const String COLUMN_FILAMENT_SIZE = "filamentSize";
   static const String COLUMN_FILAMENT_TYPE = "filamentType";
   static const String COLUMN_NAME = "name";
+  // static const String COLUMN_SPOOL_WEIGHT = "spoolWeight";
 
   DatabaseProviderProfile._();
   static final DatabaseProviderProfile db = DatabaseProviderProfile._();
@@ -50,7 +49,7 @@ class DatabaseProviderProfile {
       join(dbPath, 'profileDB.db'),
       version: 1,
       onCreate: (Database databaseProfile, int profile) async {
-        print("Creating colorTheme table");
+        print("Creating spool table");
 
         await databaseProfile.execute(
           "CREATE TABLE $TABLE_PROFILE ("
@@ -60,6 +59,7 @@ class DatabaseProviderProfile {
           "$COLUMN_FILAMENT_SIZE DOUBLE,"
           "$COLUMN_FILAMENT_TYPE STRING,"
           "$COLUMN_NAME TEXT"
+          // "$COLUMN_SPOOL_WEIGHT INTEGER "
           ")",
         );
       },

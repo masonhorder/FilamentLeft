@@ -20,6 +20,7 @@ class WrapperState extends State<Wrapper> with AfterLayoutMixin<Wrapper> {
 
     if (!openedBefore) {
       await prefs.setBool('seen', true);
+      prefs.setString("language", "English");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => new SetUp())

@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 import 'package:filament_left/analytics.dart';
 import 'package:filament_left/bloc/optInBloc.dart';
 import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/db/database_provider.dart';
 import 'package:filament_left/elements/buyMorePopUp.dart';
+import 'package:filament_left/elements/loading.dart';
 import 'package:filament_left/elements/progressBar.dart';
 import 'package:filament_left/events/optInEvent.dart';
 import 'package:filament_left/events/profileEvent.dart';
 import 'package:filament_left/functions/functions.dart';
-import 'package:filament_left/functions/openLinks.dart';
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/optIn.dart';
 import 'package:filament_left/models/profiles.dart';
@@ -21,9 +21,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image/image.dart' as img;
-import 'package:flutter/services.dart';
-import 'package:path/path.dart' as pathMod;
-import 'package:path_provider/path_provider.dart';
 import 'package:tflite_flutter/tflite_flutter.dart' as tfl;
 import 'package:image_size_getter/image_size_getter.dart';
 import 'package:image_size_getter/file_input.dart'; 
@@ -41,8 +38,6 @@ class Camera extends StatefulWidget {
 class CameraState extends State<Camera> {
   File _image;
   Image imageType;
-  var _recognition;
-  var _path;
   num width;
   num height;
   List finalCoordinates = [];
@@ -58,6 +53,9 @@ class CameraState extends State<Camera> {
   File imageFile;
   String debugString = "debug:";
   Uint8List rectImage;
+  bool scanning = false;
+  var rgb;
+  var interpreter;
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
@@ -88,6 +86,7 @@ class CameraState extends State<Camera> {
         BlocProvider.of<OptInBloc>(context).add(SetOptIns(optInList));
       },
     );
+    // interpreter = await tfl.Interpreter.fromAsset('v11-model.tflite');
   }
 
   @override
@@ -101,7 +100,7 @@ class CameraState extends State<Camera> {
 
 
   Future scanImage(File image) async {
-    print("scan");
+    // print("scan");
     
     setState(() {
       debugString += "\nscanning";
@@ -110,7 +109,6 @@ class CameraState extends State<Camera> {
       final imageSize = ImageSizeGetter.getSize(FileInput(_image));
       height = imageSize.height;
       width = imageSize.width;
-      _path = image.path;
     });
     // print("preconvert");
     List converted = await preConvert();
@@ -123,11 +121,12 @@ class CameraState extends State<Camera> {
 
 
     ratio = (endY-startY)/(endX-startX);
-    print(ratio);
+    // print(ratio);
     debugString += "\nratio: $ratio";
-
+    // 
     setState(() {
-      byteData = originalByteData.buffer.asUint8List();      
+      byteData = originalByteData.buffer.asUint8List();   
+      rgb = getAvgColor(img.decodeImage(byteData));
       if(Scan.profile != null){
         Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
         Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
@@ -142,20 +141,22 @@ class CameraState extends State<Camera> {
   }
 
   Future<List> recognize(List imageList) async {
-    print("recognize");
+    if(interpreter == null){
+      interpreter = await tfl.Interpreter.fromAsset('v11-model.tflite');
+    }
+    // print("recognize");
     imageCache.clear();
-    final interpreter = await tfl.Interpreter.fromAsset('v9-model.tflite');
     var input = imageList.reshape([1,224,224,3]);
-    List output = List(1*4).reshape([1,4]);
+    List output = List.filled(1*4, "", growable: true).reshape([1,4]);
     interpreter.run(input, output);
-    print(output);
+    // print(output);
     interpreter.close();
     return output;
   }
 
 
   Future<List> preConvert() async{
-    print("preconvert");
+    // print("preconvert");
     debugString += "\npreconvert";
     Future<img.Image> getUiImage() async {
       final Uint8List assetImageByteData = await _image.readAsBytes();
@@ -180,16 +181,38 @@ class CameraState extends State<Camera> {
 
   postConvert(List output) async{
     finalCoordinates = [];
-    print("postconvert");
-    debugString += "\npost convert";
-    int index = 0;
-    
+    // print("postconvert");
+    debugString += "\npost convert";    
     finalCoordinates.add(output[0][0]*width);
     finalCoordinates.add(output[0][1]*height);
     finalCoordinates.add(output[0][2]*width);
     finalCoordinates.add(output[0][3]*height);
-        
-    print(finalCoordinates);
+    // print(finalCoordinates);
+  }
+
+  getAvgColor(img.Image image){
+    List rgb = [];
+    img.Image cropped = img.copyCrop(image, finalCoordinates[0].round(), finalCoordinates[1].round(), finalCoordinates[2].round()-finalCoordinates[0].round(), finalCoordinates[3].round()-finalCoordinates[1].round());
+    int redBucket = 0;
+    int greenBucket = 0;
+    int blueBucket = 0;
+    int pixelCount = 0;
+
+    for (int y = 0; y < cropped.height; y++) {
+      for (int x = 0; x < cropped.width; x++) {
+        int c = cropped.getPixel(x, y);
+
+        pixelCount++;
+        redBucket += img.getRed(c);
+        greenBucket += img.getGreen(c);
+        blueBucket += img.getBlue(c);
+      }
+    }
+
+    rgb.add((redBucket/pixelCount).round());
+    rgb.add((greenBucket/pixelCount).round());
+    rgb.add((blueBucket/pixelCount).round());
+    return rgb;
   }
 
 
@@ -248,7 +271,7 @@ class CameraState extends State<Camera> {
     );
   }
 
-
+  
   firstScanPopUp(BuildContext context, List optInList) {
     showDialog(
       barrierDismissible: false,
@@ -261,7 +284,7 @@ class CameraState extends State<Camera> {
           children:[
             Container(
               child: SingleChildScrollView(
-                child: Text("By continuing to use the scan feature you agree and understand that we will use your scanned photos to help train the future models. We do collect this data solely for the puprose of improving scanning, once the photo has been evaluated we will remove it from the database. This photo is not attached to your idenity at all, it is completely anonymous. Thanks for your understanding! You can opt out any time in settings!", style: basicBlack,),
+                child: Text("If you are willing to share your photos from your scan please opt in. These photos will be used to help train future models. This has no cost to you and helps the model a ton!(you can change this option in settings if you need too)", style: basicBlack,),
               )
             ),
           ]
@@ -270,25 +293,22 @@ class CameraState extends State<Camera> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              analytics.logEvent(name: "optIn", parameters: {"optedIn": "false"});
-              // OptIn optIn = OptIn(
-              //   id: 1,
-              //   optIn: 1,
-              // );
-              // DatabaseProviderOptIn.db.update(optIn).then(
-              //   (measureList) {
-              //     BlocProvider.of<OptInBloc>(context).add(UpdateOptIn(0, optIn));
-              //   },
-              // );
+              OptIn optIn = OptIn(
+                id: 1,
+                optIn: 1,
+              );
+              DatabaseProviderOptIn.db.update(optIn).then(
+                (measureList) {
+                  BlocProvider.of<OptInBloc>(context).add(UpdateOptIn(0, optIn));
+                },
+              );
               Navigator.pop(context);
-              Navigator.pop(context);
-              // Future.delayed(Duration.zero, () => betaPopUp(context));
+              Future.delayed(Duration.zero, () => betaPopUp(context));
             },
-            child: Text("Cancel", style: basicBlack,),
+            child: Text("Don't share", style: basicBlack,),
           ),
           TextButton(
             onPressed: () {
-              analytics.logEvent(name: "optIn", parameters: {"optedIn": "true"});
               OptIn optIn = OptIn(
                 id: 1,
                 optIn: 2,
@@ -317,9 +337,6 @@ class CameraState extends State<Camera> {
 
   @override 
   Widget build(BuildContext context){
-    final size = MediaQuery.of(context).size;
-    final deviceRatio = size.height / size.width;
-
 
     return Scaffold(
       body: BlocConsumer<OptInBloc, List<OptIn>>(
@@ -331,10 +348,10 @@ class CameraState extends State<Camera> {
           //   Scan.diameter = null;
           // }
           if(optInList.length != 0){
-            if(optInList[0].optIn == 0 || optInList[0].optIn == 1){
+            if(optInList[0].optIn == 0){
               if(!popUpTriggered){
-                print(optInList);
-                print(optInList[0].optIn);
+                // print(optInList);
+                // print(optInList[0].optIn);
                 popUpTriggered = true;
                 Future.delayed(Duration.zero, () => firstScanPopUp(context, optInList));
               }
@@ -382,7 +399,7 @@ class CameraState extends State<Camera> {
                             ),
                             Row(
                               children: [
-                                Text("Scan", style: pageHeader,),
+                                Text(langMap()['scan'], style: pageHeader,),
                                 SizedBox(width: 5),
                                 // Container(
                                 //   child: Text("Beta", style: basicBlack,),
@@ -412,6 +429,22 @@ class CameraState extends State<Camera> {
                           child: Column(
                             children: [
 
+                              scanning ? Container(
+                                // width: MediaQuery.of(context).size.width *.5,
+                                height: 400,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Loading(),
+                                      Text("Running Scanning... this make take a few seconds")
+                                    ],
+                                  )
+                                )
+                              )
+
+                              :
+
                               rectImage == null 
 
                               ?
@@ -420,7 +453,7 @@ class CameraState extends State<Camera> {
                                 children:[
                                   SizedBox(height: 20),
                                   Container(
-                                    child: Center(child: Text("Always double check measurements!", textAlign: TextAlign.center,)),
+                                    child: Center(child: Text(langMap()['dblCheck'], textAlign: TextAlign.center,)),
                                     width: MediaQuery.of(context).size.width*.9,
                                   ),
                                   SizedBox(height:30),
@@ -467,7 +500,7 @@ class CameraState extends State<Camera> {
                                       }
                                     },
                                   ),
-                                  SizedBox(height:3),
+                                  SizedBox(height:8),
                                   InkWell(
                                     child: Container(
                                       padding: EdgeInsets.symmetric(horizontal: 30,vertical: 17),
@@ -475,9 +508,12 @@ class CameraState extends State<Camera> {
                                         color: darkBlue,
                                         borderRadius: BorderRadius.circular(10)
                                       ),
-                                      child: Text("Scan"),
+                                      child: Text(langMap()['scan']),
                                     ),
                                     onTap: () async {
+                                      setState(() {
+                                        scanning = true;
+                                      });
                                       File tempFile = await takePhoto();
                                       setState(() {
                                         imageFile = tempFile;
@@ -488,14 +524,14 @@ class CameraState extends State<Camera> {
                                         Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
                                         Scan.diameter = (Scan.profile.width/ratio).round();
                                       }
-                                      analytics.logEvent(name: "scan");
-                                      // if(optInList[0].optIn == 2){
-                                      // upload file
-                                      uploadFile(_image, "images");
-                                      uploadFile(await getImageFileFromAssets(rectImage), "output");
-                                      
-
-                                      // }
+                                      analytics.logEvent(name: "scan", parameters: {"optIn": optInList[0].optIn == 2 ? true : false});
+                                      if(optInList[0].optIn == 2){
+                                        uploadFile(_image, "images");
+                                        uploadFile(await getImageFileFromAssets(rectImage), "output");                                      
+                                      }
+                                      setState(() {
+                                        scanning = false;
+                                      });
                                     },
                                   ),
                                 ]
@@ -510,7 +546,7 @@ class CameraState extends State<Camera> {
                                     quarterTurns: 1,
                                     child: Image.memory(rectImage, width: (MediaQuery.of(context).size.width *.5)*2,),
                                   ),
-                                  SizedBox(height:3),
+                                  SizedBox(height:8),
                                   InkWell(
                                     child: Container(
                                       padding: EdgeInsets.symmetric(horizontal: 30,vertical: 17),
@@ -518,7 +554,7 @@ class CameraState extends State<Camera> {
                                         color: darkBlue,
                                         borderRadius: BorderRadius.circular(10)
                                       ),
-                                      child: Text("Re-Scan"),
+                                      child: Text(langMap()['rescan']),
                                     ),
                                     onTap: () async {
                                       setState(() {
@@ -533,7 +569,7 @@ class CameraState extends State<Camera> {
                               SizedBox(height:10),
 
                               profileList.length == 0 ?
-                                Text("Atleast 1 Spool Type is required(add one in settings tab under \"Spools\")", style: basicBlack, textAlign: TextAlign.center,)
+                                Text(langMap()['spoolReqStr'], style: basicBlack, textAlign: TextAlign.center,)
                                 :
                                 Container(
                                   padding: EdgeInsets.all(9),
@@ -546,17 +582,17 @@ class CameraState extends State<Camera> {
                                     isExpanded:true,
                                     iconEnabledColor: darkBlue,
                                     dropdownColor: Colors.white,
-                                    validator: (value) => value == null ? 'Spool Type Required' : null,
+                                    validator: (value) => value == null ? langMap()['spoolReq'] : null,
                                     value: Scan.profileName,
                                     hint: Text(
-                                      'Select a Spool Type',
+                                      langMap()['slctSpool'],
                                       style: basicDarkBlue,
                                     ),
                                     items: profileList.map((var value) {
                                       return new DropdownMenuItem<String>(
                                         
                                         value: value.id.toString(),
-                                        child: new Text("${value.name} - ${value.filamentSize}mm ${value.filamentType}", style: basicDarkBlue, overflow: TextOverflow.ellipsis,),
+                                        child: new Text("${value.name} - ${value.filamentSize}${langMap()['mm']} ${value.filamentType}", style: basicDarkBlue, overflow: TextOverflow.ellipsis,),
                                       );
                                     }).toList(),
                                     onChanged: (value) {
@@ -566,6 +602,7 @@ class CameraState extends State<Camera> {
                                         for(var document in profileList){
                                           if(document.id.toString() == value){
                                             Scan.profile = document;
+                                            Scan.name = document.name;
                                           }
                                         }
                                       });
@@ -611,17 +648,19 @@ class CameraState extends State<Camera> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Meters Left: ${Scan.meters}m", style: basicMediumDarkBlue,),
-          Text("Grams Left: ${Scan.grams}g", style: basicMediumDarkBlue,),
-          Text("Predicted Diameter: ${Scan.diameter}mm", style: basicSmallBlack,),
-          Text("Predicted Circumference: ${Scan.diameter*3.14}mm", style: basicSmallBlack,),
+          Text("${langMap()['mtrsLeft']} ${Scan.meters}${langMap()['m']}", style: basicMediumDarkBlue,),
+          Text("${langMap()['gramsLeft']} ${Scan.grams}${langMap()['g']}", style: basicMediumDarkBlue,),
+          Text("${langMap()['prdctDiam']} ${Scan.diameter}${langMap()['mm']}", style: basicSmallBlack,),
+          Text("${langMap()['prdctCirc']} ${Scan.diameter*3.14}${langMap()['mm']}", style: basicSmallBlack,),
           progressBar(context, Scan.grams),
           SizedBox(height: 15,),
           InkWell(
             onTap: (){
-              BuyMore.brand = Scan.profileName;
+              print(Scan.profileName);
+              BuyMore.brand = Scan.name; 
               BuyMore.material = Scan.profile.filamentType;
               BuyMore.size = Scan.profile.filamentSize;
+              BuyMore.rgb = rgb;
               buyMorePopUp(context);
             }, 
             child: Container(
@@ -634,7 +673,7 @@ class CameraState extends State<Camera> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Buy More", style: basicWhite,),
+                  Text(langMap()['buyMore'], style: basicWhite,),
                   SizedBox(width:8),
                   Icon(Icons.open_in_new, color: whiteFontColor, size: 18,)
                 ],
@@ -647,7 +686,6 @@ class CameraState extends State<Camera> {
     }
     return SizedBox(height: 1);
   }
-
 }
 
 

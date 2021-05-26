@@ -1,15 +1,10 @@
 import 'dart:io';
-import 'package:filament_left/Screens/home.dart';
-import 'package:filament_left/Screens/settings.dart';
 import 'package:filament_left/bloc/measureBloc.dart';
 import 'package:filament_left/bloc/optInBloc.dart';
 import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/bloc/spoolBloc.dart';
 import 'package:filament_left/models/currentDevice.dart';
-import 'package:filament_left/models/measure.dart';
-import 'package:filament_left/models/optIn.dart';
-import 'package:filament_left/models/profiles.dart';
-import 'package:filament_left/screens/spools.dart';
+import 'package:filament_left/models/sharedPrefs.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:filament_left/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -77,7 +73,7 @@ class _MyAppState extends State<MyApp> {
       bottomNotch = iphones.contains(await getDevice());
       device = await getDevice();
     }
-    
+    SharedPrefs.prefs = await SharedPreferences.getInstance();
     setState(() {
       CurrentDevice.hasNotch = bottomNotch;
       CurrentDevice.device = device;

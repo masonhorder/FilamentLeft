@@ -4,6 +4,7 @@ import 'package:filament_left/Screens/settings/editProfile.dart';
 import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/db/database_provider.dart';
 import 'package:filament_left/events/profileEvent.dart';
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/editParams.dart';
 import 'package:filament_left/models/profiles.dart';
@@ -49,7 +50,7 @@ class ProfilesState extends State<Profiles> {
                         width: 55,
                         child: IconButton(icon: Icon(Icons.chevron_left, color: darkFontColor,), onPressed: (){ Navigator.pop(context);}, iconSize: 50)
                       ),
-                      Text("Profiles", style: pageHeader, overflow: TextOverflow.ellipsis,),
+                      Text(langMap()['profiles'], style: pageHeader, overflow: TextOverflow.ellipsis,),
                       SizedBox(width: 55)
                     ]
                   ),
@@ -83,8 +84,8 @@ class ProfilesState extends State<Profiles> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("${profileList[index].name} - ${profileList[index].filamentSize}mm ${profileList[index].filamentType}", style: basicSmallBlack, overflow: TextOverflow.ellipsis,),
-                                    IconButton(icon: Icon(Icons.edit), onPressed: (){
+                                    Text("${profileList[index].name} - ${profileList[index].filamentSize}${langMap()['mm']} ${profileList[index].filamentType}", style: basicSmallBlack, overflow: TextOverflow.ellipsis,),
+                                    IconButton(color: darkFontColor, icon: Icon(Icons.edit), onPressed: (){
                                       ActiveProfile.index = profileList.indexOf(profileList[index]);
                                       ActiveProfile.isEditing = true;
                                       ActiveProfile.profile = profileList[index];
@@ -106,7 +107,7 @@ class ProfilesState extends State<Profiles> {
 
                           :
 
-                          Center(child: Text("No profiles set up yet", style: basicDarkBlue,)),
+                          Center(child: Text(langMap()['noProf'], style: basicDarkBlue,)),
                       )
                     ]
                   )

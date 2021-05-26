@@ -1,3 +1,4 @@
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:flutter/material.dart';
 
@@ -7,13 +8,13 @@ spoolHelp(BuildContext context){
     context: context,
     builder: (context) => AlertDialog(
       backgroundColor: Colors.white,
-      title: Text("Filament Spool Type Help", style: popUpTitle,), 
+      title: Text(langMap()['spoolHelp'], style: popUpTitle,), 
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children:[
           Container(
             child: SingleChildScrollView(
-              child: Text("This is used to indetify key measurements of the spool and making it so you only have to enter it once. You can add your own spool below.", style: basicBlack,),
+              child: Text(langMap()['shDesc'], style: basicBlack,),
             )
           ),
         ]
@@ -24,13 +25,13 @@ spoolHelp(BuildContext context){
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text("Close", style: basicBlack,),
+          child: Text(langMap()['close'], style: basicBlack,),
         ),
         TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text("Add Spool", style: basicDarkBlue,),
+          child: Text(langMap()['addSpool'], style: basicDarkBlue,),
         ),
       ],
     ),

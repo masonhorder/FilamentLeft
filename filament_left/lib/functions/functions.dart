@@ -1,14 +1,10 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-// import 'package:flutter/services.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as Path;  
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
-// import 'package:path_provider/path_provider.dart';
-import 'package:image/image.dart' as img;
 import 'package:url_launcher/url_launcher.dart';
 
 
@@ -115,7 +111,7 @@ Future<String> uploadFile(File _image, String path) async {
       .child('$path/${DateTime.now().microsecondsSinceEpoch}.png');
   UploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask;
-  print('File Uploaded');
+  // print('File Uploaded');
   String returnURL;
   await storageReference.getDownloadURL().then((fileURL) {
     returnURL =  fileURL;
@@ -148,8 +144,9 @@ getColor(int grams){
 
 openLink(String url) async {
   try{
-    await launch(url);
+    await launch(url, forceSafariVC: false);
   } on Exception catch (_) {
     throw 'Could not launch $url';
   }
 }
+

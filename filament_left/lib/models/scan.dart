@@ -7,4 +7,5 @@ class Scan{
   static int meters;
   static int grams;
   static int diameter;
+  static String name;
 }

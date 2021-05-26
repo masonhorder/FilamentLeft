@@ -3,7 +3,7 @@ import 'package:filament_left/models/optIn.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OptInBloc extends Bloc<OptInEvent, List<OptIn>> {
-  OptInBloc(List<OptIn> initialState) : super(List<OptIn>());
+  OptInBloc(List<OptIn> initialState) : super([]);
 
   // @override
   // List<Food> get initialState => List<Food>();

@@ -1,12 +1,11 @@
 import 'package:filament_left/analytics.dart';
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/editParams.dart';
-import 'package:filament_left/style/formStyle.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:filament_left/models/presets.dart';
-import 'package:path/path.dart';
 
 class PresetProfiles extends StatefulWidget{
   @override
@@ -28,6 +27,7 @@ class PresetProfilesState extends State<PresetProfiles>{
         children: [
           Text(preset[0], style: basicBlackBold,),
           IconButton(
+            color: darkFontColor,
             icon: Icon(Icons.add), 
             onPressed: () {
               analytics.logEvent(name: "addPreset", parameters: {"brand": preset[0]});
@@ -115,6 +115,7 @@ class PresetProfilesState extends State<PresetProfiles>{
                       ),
                     ),
                     IconButton(
+                      color: darkFontColor,
                       icon: Icon(Icons.search),
                       onPressed: (){
                         if(searchTerm != null){
@@ -147,7 +148,7 @@ class PresetProfilesState extends State<PresetProfiles>{
                 ),
               ),
               Container(
-                child: Text("Share your Filament's presets: \nEmail masonhorder.dev@gmail.com with the spool dimensions", style: basicSmallBlack, textAlign: TextAlign.center,)
+                child: Text(langMap()['sharePresets'], style: basicSmallBlack, textAlign: TextAlign.center,)
               ),
                 
               SizedBox(height: 20)

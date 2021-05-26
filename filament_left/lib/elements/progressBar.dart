@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 progressBar(BuildContext context, int grams){
   getWidth(int grams){
-    print("grams: $grams");
+    // print("grams: $grams");
     if(grams == null){
       return 0.0;
     }

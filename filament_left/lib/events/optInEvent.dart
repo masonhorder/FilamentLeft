@@ -45,19 +45,3 @@ class DeleteOptIn extends OptInEvent {
     optInIndex = index;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

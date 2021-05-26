@@ -7,6 +7,7 @@ class Profile {
   double filamentSize;
   String filamentType;
   String name;
+  int spoolWeight;
 
 
   Profile({this.id, this.inner, this.width, this.filamentSize, this.filamentType, this.name});
@@ -18,6 +19,7 @@ class Profile {
       DatabaseProviderProfile.COLUMN_FILAMENT_SIZE: filamentSize,
       DatabaseProviderProfile.COLUMN_FILAMENT_TYPE: filamentType,
       DatabaseProviderProfile.COLUMN_NAME: name,
+      // DatabaseProviderProfile.COLUMN_SPOOL_WEIGHT: spoolWeight,
     };
 
     if (id != null) {
@@ -27,6 +29,7 @@ class Profile {
       map[DatabaseProviderProfile.COLUMN_FILAMENT_SIZE] =  filamentSize;
       map[DatabaseProviderProfile.COLUMN_FILAMENT_TYPE] =  filamentType;
       map[DatabaseProviderProfile.COLUMN_NAME] =  name;
+      // map[DatabaseProviderProfile.COLUMN_SPOOL_WEIGHT] =  spoolWeight;
     }
 
     return map;

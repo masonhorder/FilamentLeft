@@ -3,6 +3,7 @@ import 'package:filament_left/analytics.dart';
 import 'package:filament_left/bloc/profileBloc.dart';
 import 'package:filament_left/db/database_provider.dart';
 import 'package:filament_left/events/profileEvent.dart';
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/editParams.dart';
 import 'package:filament_left/models/profiles.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:filament_left/screens/settings/presetProfiles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Edit extends StatefulWidget{
   @override
@@ -41,6 +43,13 @@ class EditState extends State<Edit>{
   var profileInner;
   var profileWidth;
 
+  SharedPreferences prefs;
+  getPrefs()async{
+    prefs = await SharedPreferences.getInstance();
+  }
+
+   
+
 
 
   editingTitle(Profile profile){
@@ -56,8 +65,7 @@ class EditState extends State<Edit>{
 
   @override
   Widget build(BuildContext context) {
-    
-    
+    getPrefs();
 
     return KeyboardDismisser(
       gestures: [GestureType.onTap, GestureType.onPanUpdateDownDirection],
@@ -77,7 +85,7 @@ class EditState extends State<Edit>{
                       width: 55,
                       child: IconButton(icon: Icon(Icons.chevron_left, color: darkFontColor,), onPressed: (){ Navigator.pop(context);}, iconSize: 50)
                     ),
-                    Text(ActiveProfile.isEditing ? "Edit" : "Add", style: pageHeader,),
+                    Text(ActiveProfile.isEditing ? langMap()['edit'] : langMap()['add'], style: pageHeader,),
                     SizedBox(width: 55)
                   ]
                 ),
@@ -106,7 +114,7 @@ class EditState extends State<Edit>{
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children:[
-                                    Text("Common Spool Presets", style: basicLargeBlack,),
+                                    Text(langMap()['commonPresets'], style: basicLargeBlack,),
                                     SizedBox(width: 7),
                                     Icon(Icons.open_in_new, size: 40,)
                                   ]
@@ -117,7 +125,7 @@ class EditState extends State<Edit>{
                             Container(
                               margin: EdgeInsets.symmetric(horizontal:30,),
                               alignment: Alignment.centerLeft,
-                              child: Text("Profile Name:", style: basicMediumBlack),
+                              child: Text(langMap()['profileName'], style: basicMediumBlack),
                             ),
                             SizedBox(height:10),
                             Container(
@@ -128,7 +136,7 @@ class EditState extends State<Edit>{
                                 decoration: textInputDecoration.copyWith(hintText: 'name'),
                                 validator: (val) {
                                   if (val.isEmpty || val == "" || val == null) {
-                                    return 'this value is required';
+                                    return langMap()['valReq'];
                                   }
                                   
                                   return null;
@@ -145,7 +153,7 @@ class EditState extends State<Edit>{
                             Container(
                               margin: EdgeInsets.symmetric(horizontal:30),
                               alignment: Alignment.centerLeft,
-                              child: Text("Inner Diameter of The Spool(mm):", style: basicMediumBlack),
+                              child: Text(langMap()['innerDiamEdit'], style: basicMediumBlack),
                             ),
                             SizedBox(height:10),
                             Container(
@@ -157,10 +165,10 @@ class EditState extends State<Edit>{
                                 decoration: textInputDecoration.copyWith(hintText: 'inner diameter'),
                                 validator: (val) {
                                   if (val.isEmpty || val == "" || val == null) {
-                                    return 'this value is required';
+                                    return langMap()['valReq'];
                                   }
                                   if(int.parse(val) == null) {
-                                    return 'integers only';
+                                    return langMap()['intOnly'];
                                   }
                                   return null;
                                 },
@@ -176,7 +184,7 @@ class EditState extends State<Edit>{
                             Container(
                               padding: EdgeInsets.only(left:30, right: 30, bottom: 8),
                               alignment: Alignment.centerLeft,
-                              child: Text("Width of The Spool(mm):", style: basicMediumBlack),
+                              child: Text(langMap()["spoolWidth"], style: basicMediumBlack),
                             ),
 
                             Container(
@@ -188,10 +196,10 @@ class EditState extends State<Edit>{
                                 decoration: textInputDecoration.copyWith(hintText: 'width of the spool'),
                                 validator: (val) {
                                   if (val.isEmpty || val == "" || val == null) {
-                                    return 'this value is required';
+                                    return langMap()['valReq'];
                                   }
                                   if(int.parse(val) == null) {
-                                    return 'integers only';
+                                    return langMap()['intOnly'];
                                   }
                                   return null;
                                 },
@@ -202,10 +210,38 @@ class EditState extends State<Edit>{
                               ),
                             ),
                             SizedBox(height: 40),
+                            // Container(
+                            //   padding: EdgeInsets.only(left:30, right: 30, bottom: 8),
+                            //   alignment: Alignment.centerLeft,
+                            //   child: Text(langMap()['spoolWeight'], style: basicMediumBlack),
+                            // ),
+                            // Container(
+                            //   padding: EdgeInsets.only(left:30, right: 30),
+                            //   child: TextFormField(
+                            //     // initialValue: ActiveProfile.profile.wudth.toString(),
+                            //     controller: EditForm.widthController,
+                            //     keyboardType:  TextInputType.number,
+                            //     decoration: textInputDecoration.copyWith(hintText: langMap()['initWeight']),
+                            //     validator: (val) {
+                            //       if (val.isEmpty || val == "" || val == null) {
+                            //         return langMap()['valReq'];
+                            //       }
+                            //       if(int.parse(val) == null) {
+                            //         return langMap()['intOnly'];
+                            //       }
+                            //       return null;
+                            //     },
+                            //     onChanged: (val) {
+                            //       setState(() => profileWidth = int.parse(val));
+                                  
+                            //     },
+                            //   ),
+                            // ),
+                            // SizedBox(height: 40),
                             Container(
                               margin: EdgeInsets.symmetric(horizontal:30,),
                               alignment: Alignment.centerLeft,
-                              child: Text("Filament Size:", style: basicMediumBlack),
+                              child: Text(langMap()['filSize'], style: basicMediumBlack),
                             ),
                             SizedBox(height:10),
                             Container(
@@ -224,7 +260,7 @@ class EditState extends State<Edit>{
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children:[
-                                  Text("1.75mm", style: basicBlack,),
+                                  Text(langMap()['1.75'], style: basicBlack,),
                                   Switch(
                                     value: EditForm.filament, 
                                     onChanged: (val){
@@ -233,7 +269,7 @@ class EditState extends State<Edit>{
                                       });
                                     }
                                   ),
-                                  Text("2.85mm", style: basicBlack,),
+                                  Text(langMap()['2.85'], style: basicBlack,),
                                 ]
                               ),
                             ),
@@ -241,7 +277,7 @@ class EditState extends State<Edit>{
                             Container(
                               margin: EdgeInsets.symmetric(horizontal:30,),
                               alignment: Alignment.centerLeft,
-                              child: Text("Filament Type:", style: basicMediumBlack),
+                              child: Text("${langMap()['filType']}:", style: basicMediumBlack),
                             ),
                             SizedBox(height:10),
                             Container(
@@ -261,10 +297,10 @@ class EditState extends State<Edit>{
                                 child: DropdownButtonFormField<String>(
                                   iconEnabledColor: darkBlue,
                                   dropdownColor: blue,
-                                  validator: (value) => value == null ? 'Language Required' : null,
+                                  validator: (value) => value == null ? langMap()['filReq'] : null,
                                   value: EditForm.filamentType,
                                   hint: Text(
-                                    'Filament Type',
+                                    langMap()['filType'],
                                     style: basicDarkBlue,
                                   ),
 
@@ -293,6 +329,15 @@ class EditState extends State<Edit>{
                                 onTap: (){
                                   if (_formKey.currentState.validate()) {
                                     if(ActiveProfile.isEditing){
+                                      if(EditForm.name == null){
+                                        EditForm.name = EditForm.nameController.text;
+                                      }
+                                      if(EditForm.inner == null){
+                                        EditForm.inner = int.parse(EditForm.innerController.text);
+                                      }
+                                      if(EditForm.width == null){
+                                        EditForm.width = int.parse(EditForm.widthController.text);
+                                      }
                                       Profile profile = Profile(
                                         id: ActiveProfile.profile.id,
                                         name: EditForm.name,
@@ -311,13 +356,24 @@ class EditState extends State<Edit>{
                                       });
                                     }
                                     else{
+                                      print("name: " + EditForm.nameController.text);
+                                      if(EditForm.name == null){
+                                        EditForm.name = EditForm.nameController.text;
+                                      }
+                                      if(EditForm.inner == null){
+                                        EditForm.inner = int.parse(EditForm.innerController.text);
+                                      }
+                                      if(EditForm.width == null){
+                                        EditForm.width = int.parse(EditForm.widthController.text);
+                                      }
                                       Profile profile = Profile(
-                                        name: profileName,
-                                        inner: profileInner,
-                                        width: profileWidth,
+                                        name: EditForm.name,
+                                        inner: EditForm.inner,
+                                        width: EditForm.width,
                                         filamentSize: EditForm.filament ? 2.85 : 1.75,
                                         filamentType: EditForm.filamentType,
                                       );
+                                      print("profile:" + profile.name);
                                       setState(() {
                                         DatabaseProviderProfile.db.insert(profile).then(
                                           (storedProfile) => BlocProvider.of<ProfileBloc>(context).add(
@@ -351,7 +407,7 @@ class EditState extends State<Edit>{
                                     //   BoxShadow(color: Colors.green, spreadRadius: 3),
                                     // ],
                                   ),
-                                  child: Text(ActiveProfile.isEditing ? "Save Changes" : "Add", style: basicWhite,)
+                                  child: Text(ActiveProfile.isEditing ? langMap()['save'] : langMap()['add'], style: basicWhite,)
                                 ),
                               ),
                             ),
@@ -382,7 +438,7 @@ class EditState extends State<Edit>{
                                       //   BoxShadow(color: Colors.green, spreadRadius: 3),
                                       // ],
                                     ),
-                                    child: Text("Delete", style: basicWhite,)
+                                    child: Text(langMap()['del'], style: basicWhite,)
                                   ),
                                 ),
                               )
@@ -395,7 +451,7 @@ class EditState extends State<Edit>{
 
                             SizedBox(height: 25),
                             InkWell(
-                              child: Text("Get Help Measuring", style: basicBlack,),
+                              child: Text(langMap()['helpMsr'], style: basicBlack,),
                               onTap: (){
                                 Navigator.push(
                                   context,

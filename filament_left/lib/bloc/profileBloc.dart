@@ -3,7 +3,7 @@ import 'package:filament_left/models/profiles.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, List<Profile>> {
-  ProfileBloc(List<Profile> initialState) : super(List<Profile>());
+  ProfileBloc(List<Profile> initialState) : super([]);
 
   // @override
   // List<Food> get initialState => List<Food>();

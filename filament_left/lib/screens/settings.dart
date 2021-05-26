@@ -7,12 +7,14 @@ import 'package:filament_left/db/database_provider.dart';
 import 'package:filament_left/events/measureEvent.dart';
 import 'package:filament_left/events/optInEvent.dart';
 import 'package:filament_left/functions/openLinks.dart';
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/measure.dart';
 import 'package:filament_left/models/optIn.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -22,6 +24,12 @@ class Settings extends StatefulWidget {
 class SettingsState extends State<Settings> {
   
   bool measureSwitch = false;
+  SharedPreferences prefs;
+
+  getPrefs()async{
+    prefs = await SharedPreferences.getInstance();
+  }
+   
 
   @override
   void initState() {
@@ -36,10 +44,12 @@ class SettingsState extends State<Settings> {
         BlocProvider.of<OptInBloc>(context).add(SetOptIns(optInList));
       },
     );
+    
   }
 
   @override
   Widget build(BuildContext context) {
+    getPrefs();
 
 
     
@@ -62,7 +72,7 @@ class SettingsState extends State<Settings> {
                   children: [
                     SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
 
-                    Text("Settings", style: pageHeader,),
+                    Text(langMap()['settings'], style: pageHeader,),
                     SizedBox(height: 15),
                     
                     
@@ -102,7 +112,7 @@ class SettingsState extends State<Settings> {
                                   children: [
                                     Container(
                                       margin: EdgeInsets.only(left:40),
-                                      child:Text("Spools", style: basicLargeDarkBlue,),
+                                      child:Text(langMap()['spools'], style: basicLargeDarkBlue,),
                                     ),
                                     Container(
                                       width:50,
@@ -138,7 +148,7 @@ class SettingsState extends State<Settings> {
                                   children: [
                                     Container(
                                       margin: EdgeInsets.only(left:40),
-                                      child:Text("Help", style: basicLargeDarkBlue,),
+                                      child:Text(langMap()['help'], style: basicLargeDarkBlue,),
                                     ),
                                     Container(
                                       width:50,
@@ -167,19 +177,19 @@ class SettingsState extends State<Settings> {
                                   Container(
                                     margin: EdgeInsets.symmetric(horizontal: 30),
                                     // alignment: Alignment.centerLeft,
-                                    child:Text("Default Measure By:", style: basicMediumBlack,),
+                                    child:Text(langMap()['defMsrBy'], style: basicMediumBlack,),
                                   ),
 
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children:[
                                         
-                                      Text("Diameter", style: basicBlack,),
+                                      Text(langMap()['diam'], style: basicBlack,),
                                       Switch(
                                         value: measureSwitch, 
                                         onChanged: (val){
                                           setState(() {
-                                            print("switch");
+                                            // print("switch");
                                             measureSwitch = measureSwitch ? false : true;
                                             Measure newMeasure = Measure(
                                               id: measureList[0].id,
@@ -199,7 +209,7 @@ class SettingsState extends State<Settings> {
                                           });
                                         }
                                       ),
-                                      Text("Circumference", style: basicBlack,),
+                                      Text(langMap()['circ'], style: basicBlack,),
                                     ]
                                   ),
                                 ]
@@ -224,7 +234,7 @@ class SettingsState extends State<Settings> {
                                   Container(
                                     margin: EdgeInsets.symmetric(horizontal: 30),
                                     // alignment: Alignment.centerLeft,
-                                    child:Text("Photo Scan Sharing:", style: basicMediumBlack,),
+                                    child:Text(langMap()['photoSharing'], style: basicMediumBlack,),
                                   ),
 
                                   Row(
@@ -254,13 +264,79 @@ class SettingsState extends State<Settings> {
                                           
                                         }
                                       ),
-                                      Text("Opt In!", style: basicBlack,)
+                                      Text(langMap()['optIn'], style: basicBlack,)
                                     ]
                                   )
                                 ]
                               )
                             ),
 
+
+                            SizedBox(height: 2),
+
+
+                            Container(
+                              decoration: BoxDecoration(
+                                color: whiteFontColor,
+                                border: Border(
+                                  top: BorderSide(color: darkBlue, width: 1,),
+                                  bottom: BorderSide(color: darkBlue, width: 1,),
+
+                                ),
+                              ),
+                              child: Column(
+                                children:[
+                                  SizedBox(height:6),
+
+                                  Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 30),
+                                    child:Text(langMap()['defLang'], style: basicMediumBlack,),
+                                  ),
+
+                                  Container(
+                                    padding: EdgeInsets.all(7),
+                                    margin: EdgeInsets.symmetric(horizontal: 30),
+                                    decoration: BoxDecoration(
+                                      // border: Border(
+                                      //   bottom: BorderSide(color: darkBlue, width: 2.3),
+                                      //   top: BorderSide(color: darkBlue, width: 2.3),
+                                      //   right: BorderSide(color: darkBlue, width: 2.3),
+                                      //   left: BorderSide(color: darkBlue, width: 2.3),
+                                      // ),
+                                      borderRadius: BorderRadius.circular(10),
+                                      // color: Colors.white,
+                                    ),
+                                    child: Container(
+                                      child: DropdownButtonFormField<String>(
+                                        iconEnabledColor: darkBlue,
+                                        dropdownColor: blue,
+                                        value: prefs.getString("language"),
+                                        hint: Text(
+                                          'Language',
+                                          style: basicDarkBlue,
+                                        ),
+
+                                        items: <String>['English', 'Spanish', 'French', 'German'].map((String value) {
+                                          return new DropdownMenuItem<String>(
+                                            value: value,
+                                            child: new Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) async{
+                                          setState((){
+                                            // print(value);
+                                            prefs.setString("language", value);
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                              )
+                            ),
+
+                            
+                            
 
                             
 
@@ -289,7 +365,7 @@ class SettingsState extends State<Settings> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Container(
-                                      child:Text("SUPPORT", style: basicLargeDarkBlue,),
+                                      child:Text(langMap()['support'], style: basicLargeDarkBlue,),
                                     ),
                                   ]
                                 )
@@ -324,16 +400,16 @@ class SettingsState extends State<Settings> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Container(
-                                      child:Text("WEBSITE", style: basicLargeDarkBlue,),
+                                      child:Text(langMap()['site'], style: basicLargeDarkBlue,),
                                     ),
                                   ]
                                 )
                               )
                             ),
                             SizedBox(height:30),
-                            Text("Check out our insta and twitter: @filamentleft"),
+                            Text(langMap()['promo']),
                             SizedBox(height:10),
-                            Text("Created by: Mason Horder(@mason_horder) and Dennis Zax", textAlign: TextAlign.center,)
+                            Text(langMap()['credits'], textAlign: TextAlign.center,)
                           ]
                         ),
                       )

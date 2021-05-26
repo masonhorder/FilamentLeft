@@ -10,6 +10,7 @@ import 'package:filament_left/elements/spoolHelp.dart';
 import 'package:filament_left/events/measureEvent.dart';
 import 'package:filament_left/events/profileEvent.dart';
 import 'package:filament_left/functions/functions.dart';
+import 'package:filament_left/languages/language.dart';
 import 'package:filament_left/models/calculateForm.dart';
 import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/measure.dart';
@@ -55,9 +56,9 @@ class HomeState extends State<Home> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
-                  child:Text("Inner Diameter of the spool(mm):", style: basicMediumBlack,),
+                  child:Text(langMap()['innerDiamEdit'], style: basicMediumBlack,),
                 ),
-                IconButton(icon: Icon(Icons.help), onPressed: (){
+                IconButton(color: darkFontColor, icon: Icon(Icons.help), onPressed: (){
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Help()),
@@ -74,10 +75,10 @@ class HomeState extends State<Home> {
               decoration: textInputDecoration.copyWith(hintText: 'inner diameter'),
               validator: (val) {
                 if (val.isEmpty || val == "" || val == null) {
-                  return 'this value is required';
+                  return langMap()['valReq'];
                 }
                 if(int.parse(val) == null) {
-                  return 'integers only';
+                  return langMap()['intOnly'];
                 }
                 return null;
               },
@@ -85,7 +86,8 @@ class HomeState extends State<Home> {
                 setState(() => CalculateForm.inner = int.parse(val));
                 if(CalculateForm.inner != null && CalculateForm.filamentType != null && CalculateForm.width != null && CalculateForm.outer != null){
                   setState(() {
-                    CalculateForm.value = "Meters Left: ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
+                    analytics.logEvent(name: "calculate");
+                    CalculateForm.value = "${langMap()['mtrsLeft']} ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}${langMap()['m']} \n${langMap()['grmsLeft']} ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}${langMap()['g']}";
                     CalculateForm.grams = metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round();
                   });
                 }
@@ -104,9 +106,9 @@ class HomeState extends State<Home> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
-                  child:Text("Width of the Spool(mm):", style: basicMediumBlack,),
+                  child:Text(langMap()['spoolWidth'], style: basicMediumBlack,),
                 ),
-                IconButton(icon: Icon(Icons.help), onPressed: (){
+                IconButton(color: darkFontColor, icon: Icon(Icons.help), onPressed: (){
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Help()),
@@ -123,10 +125,10 @@ class HomeState extends State<Home> {
               decoration: textInputDecoration.copyWith(hintText: 'width of the spool'),
               validator: (val) {
                 if (val.isEmpty || val == "" || val == null) {
-                  return 'this value is required';
+                  return langMap()['valReq'];
                 }
                 if(int.parse(val) == null) {
-                  return 'integers only';
+                  return langMap()['intOnly'];
                 }
                 return null;
               },
@@ -134,7 +136,8 @@ class HomeState extends State<Home> {
                 setState(() => CalculateForm.width = int.parse(val));
                 if(CalculateForm.inner != null && CalculateForm.filamentType != null && CalculateForm.width != null && CalculateForm.outer != null){
                   setState(() {
-                    CalculateForm.value = "Meters Left: ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
+                    analytics.logEvent(name: "calculate");
+                    CalculateForm.value = "${langMap()['mtrsLeft']} ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}${langMap()['m']} \n${langMap()['grmsLeft']} ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}${langMap()['g']}";
                     CalculateForm.grams = metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round();
                   });
                 }
@@ -146,7 +149,7 @@ class HomeState extends State<Home> {
           Container(
             margin: EdgeInsets.symmetric(horizontal:30,),
             alignment: Alignment.centerLeft,
-            child: Text("Filament Size:", style: basicMediumBlack),
+            child: Text(langMap()['filSize'], style: basicMediumBlack),
           ),
           SizedBox(height: 10),
           Container(
@@ -165,7 +168,7 @@ class HomeState extends State<Home> {
             child:Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children:[
-                Text("1.75mm", style: basicBlack,),
+                Text(langMap()['1.75'], style: basicBlack,),
                 Switch(
                   value: CalculateForm.filament, 
                   onChanged: (val){
@@ -174,13 +177,14 @@ class HomeState extends State<Home> {
                     });
                     if(CalculateForm.inner != null && CalculateForm.filamentType != null && CalculateForm.width != null && CalculateForm.outer != null){
                       setState(() {
-                        CalculateForm.value = "Meters Left: ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
+                        analytics.logEvent(name: "calculate");
+                        CalculateForm.value = "${langMap()['mtrsLeft']} ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}${langMap()['m']} \n${langMap()['grmsLeft']} ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}${langMap()['g']}";
                         CalculateForm.grams = metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round();
                       });
                     }
                   }
                 ),
-                Text("2.85mm", style: basicBlack,),
+                Text(langMap()['2.85'], style: basicBlack,),
               ]
             ),
           ),
@@ -188,7 +192,7 @@ class HomeState extends State<Home> {
           Container(
             margin: EdgeInsets.symmetric(horizontal:30,),
             alignment: Alignment.centerLeft,
-            child: Text("Filament Type:", style: basicMediumBlack),
+            child: Text(langMap()['filType'], style: basicMediumBlack),
           ),
           SizedBox(height: 10),
           Container(
@@ -209,10 +213,10 @@ class HomeState extends State<Home> {
               child: DropdownButtonFormField<String>(
                 iconEnabledColor: darkBlue,
                 dropdownColor: blue,
-                validator: (value) => value == null ? 'Language Required' : null,
+                validator: (value) => value == null ? langMap()['filReq'] : null,
                 value: CalculateForm.filamentType,
                 hint: Text(
-                  'Select Filament Type',
+                  langMap()['slctType'],
                   style: basicDarkBlue,
                 ),
 
@@ -229,7 +233,8 @@ class HomeState extends State<Home> {
                   });
                   if(CalculateForm.inner != null && CalculateForm.filamentType != null && CalculateForm.width != null && CalculateForm.outer != null){
                     setState(() {
-                      CalculateForm.value = "Meters Left: ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
+                      analytics.logEvent(name: "calculate");
+                      CalculateForm.value = "${langMap()['mtrsLeft']} ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}${langMap()['m']} \n${langMap()['grmsLeft']} ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}${langMap()['g']}";
                       CalculateForm.grams = metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round();
                     });                 
                   }
@@ -271,7 +276,7 @@ class HomeState extends State<Home> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Buy More", style: basicWhite,),
+                  Text(langMap()['buyMore'], style: basicWhite,),
                   SizedBox(width:8),
                   Icon(Icons.open_in_new, color: whiteFontColor, size: 18,)
                 ],
@@ -285,9 +290,9 @@ class HomeState extends State<Home> {
   }
   circumference(bool circumference){
     if(circumference){
-      return "Cirumference";
+      return langMap()['circ'];
     }
-    return "Diameter";
+    return langMap()['diam'];
   }
 
   @override
@@ -335,7 +340,7 @@ class HomeState extends State<Home> {
                     children: [
                       SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
 
-                      Text("Filament Left", style: pageHeader,),
+                      Text(langMap()['filamentLeft'], style: pageHeader,),
                       SizedBox(height: 30),
                       result(),
                       SizedBox(height: 15),
@@ -358,8 +363,8 @@ class HomeState extends State<Home> {
                                   child:Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text("Filament Spool Type:", style: basicMediumBlack,),
-                                      IconButton(icon: Icon(Icons.help), onPressed: (){
+                                      Text(langMap()['filTypeFull'], style: basicMediumBlack,),
+                                      IconButton(color: darkFontColor, icon: Icon(Icons.help), onPressed: (){
                                         return spoolHelp(context);
                                       })
                                     ]
@@ -383,23 +388,23 @@ class HomeState extends State<Home> {
                                     isExpanded:true,
                                     iconEnabledColor: darkBlue,
                                     dropdownColor: Colors.white,
-                                    validator: (value) => value == null ? 'Spool Required' : null,
+                                    validator: (value) => value == null ? langMap()['filReq'] : null,
                                     value: CalculateForm.profile,
                                     hint: Text(
-                                      'Select a Spool',
+                                      langMap()['slctSpool'],
                                       style: basicDarkBlue,
                                     ),
                                     items: dropDownList.map((var value) {
                                       if(value == "other"){
                                         return new DropdownMenuItem<String>(
                                           value: "other",
-                                          child: new Text("Enter Values", style: basicBlack, overflow: TextOverflow.ellipsis,),
+                                          child: new Text(langMap()['entrVals'], style: basicBlack, overflow: TextOverflow.ellipsis,),
                                         );
                                       }
                                       return new DropdownMenuItem<String>(
                                         
                                         value: value.id.toString(),
-                                        child: new Text("${value.name} - ${value.filamentSize}mm ${value.filamentType}", style: basicDarkBlue, overflow: TextOverflow.ellipsis,),
+                                        child: new Text("${value.name} - ${value.filamentSize}${langMap()['mm']} ${value.filamentType}", style: basicDarkBlue, overflow: TextOverflow.ellipsis,),
                                       );
                                     }).toList(),
                                     onChanged: (value) {
@@ -424,12 +429,13 @@ class HomeState extends State<Home> {
                                         
                                       }
                                       setState((){
-                                        print(value);
+                                        // print(value);
                                         CalculateForm.profile = value;
                                       });
                                       if(CalculateForm.outer != null){
                                         setState(() {
-                                          CalculateForm.value = "Meters Left: ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
+                                          analytics.logEvent(name: "calculate");
+                                          CalculateForm.value = "${langMap()['mtrsLeft']} ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}${langMap()['m']} \n${langMap()['grmsLeft']} ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}${langMap()['g']}";
                                           CalculateForm.grams = metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round();
                                         });
                                       }
@@ -449,9 +455,9 @@ class HomeState extends State<Home> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Flexible(
-                                        child:Text("Outer ${circumference(CalculateForm.circumference)} of Filament Remaining(mm):", style: basicMediumBlack,),
+                                        child:Text("${langMap()['outer']} ${circumference(CalculateForm.circumference)} ${langMap()['remain']}", style: basicMediumBlack,),
                                       ),
-                                      IconButton(icon: Icon(Icons.help), onPressed: (){
+                                      IconButton(color: darkFontColor, icon: Icon(Icons.help), onPressed: (){
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(builder: (context) => Help()),
@@ -465,13 +471,13 @@ class HomeState extends State<Home> {
                                   padding: EdgeInsets.only(left:30, right: 30),
                                   child: TextFormField(
                                     keyboardType: TextInputType.number,
-                                    decoration: textInputDecoration.copyWith(hintText: 'outer ${circumference(CalculateForm.circumference).toLowerCase()}'),
+                                    decoration: textInputDecoration.copyWith(hintText: '${langMap()['outer']} ${circumference(CalculateForm.circumference).toLowerCase()}'),
                                     validator: (val) {
                                       if (val.isEmpty || val == "" || val == null) {
-                                        return 'this value is required';
+                                        return langMap()['valReq'];
                                       }
                                       if(int.parse(val) == null) {
-                                        return 'integer only';
+                                        return langMap()['intOnly'];
                                       }
                                       return null;
                                     },
@@ -479,13 +485,15 @@ class HomeState extends State<Home> {
                                       setState(() => CalculateForm.outer = int.parse(val));
                                       if(CalculateForm.profile != null && useProfile){
                                         setState(() {
-                                          CalculateForm.value = "Meters Left: ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
+                                          analytics.logEvent(name: "calculate");
+                                          CalculateForm.value = "${langMap()['mtrsLeft']} ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}${langMap()['m']} \n${langMap()['grmsLeft']} ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}${langMap()['g']}";
                                           CalculateForm.grams = metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round();
                                         });                                      
                                       }
                                       if(!useProfile && CalculateForm.inner != null && CalculateForm.filamentType != null && CalculateForm.width != null && CalculateForm.outer != null){
                                         setState(() {
-                                          CalculateForm.value = "Meters Left: ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}m \nGrams Left: ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}g";
+                                          analytics.logEvent(name: "calculate");
+                                          CalculateForm.value = "${langMap()['mtrsLeft']} ${filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round()}${langMap()['m']} \n${langMap()['grmsLeft']} ${metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round()}${langMap()['g']}";
                                           CalculateForm.grams = metersToGrams(filamentLeft(CalculateForm.outer, CalculateForm.inner, CalculateForm.width, CalculateForm.filament ? 2.85 : 1.75, CalculateForm.circumference).round(), CalculateForm.filamentType, CalculateForm.filament).round();
                                         });
                                         

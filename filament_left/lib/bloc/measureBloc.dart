@@ -3,7 +3,7 @@ import 'package:filament_left/models/measure.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MeasureBloc extends Bloc<MeasureEvent, List<Measure>> {
-  MeasureBloc(List<Measure> initialState) : super(List<Measure>());
+  MeasureBloc(List<Measure> initialState) : super([]);
 
   // @override
   // List<Food> get initialState => List<Food>();

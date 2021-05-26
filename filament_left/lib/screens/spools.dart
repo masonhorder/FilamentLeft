@@ -27,7 +27,6 @@ class Spools extends StatefulWidget {
 }
 
 class SpoolsState extends State<Spools> {
-  final _formKey = GlobalKey<FormState>();
   var validForm = false;
   bool useProfile = true;
 
@@ -169,9 +168,9 @@ class SpoolsState extends State<Spools> {
                   return BlocConsumer<SpoolBloc, List<Spool>>(
                     listener: (BuildContext context, spoolList) {},
                     builder: (context, spoolList) {
-                      print("spool list: " + spoolList.toString());
+                      // print("spool list: " + spoolList.toString());
                       if(spoolList.toString() == "[]" || spoolList == null){
-                        print("no spools");
+                        // print("no spools");
                         return Column(
                           children: [
                             SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),

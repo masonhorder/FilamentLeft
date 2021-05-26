@@ -51,6 +51,7 @@ dependencies:
   after_layout:
   cloud_firestore:
   flushbar:
+  flutter_spinkit:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -75,7 +76,7 @@ flutter:
   assets:
     - assets/help-diam.png
     - assets/help-circumference.png
-    - assets/v9-model.tflite
+    - assets/v11-model.tflite
     - assets/example.JPG
     - assets/phone1.png
     - assets/phone1-arrow.png
