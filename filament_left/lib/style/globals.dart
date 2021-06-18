@@ -55,6 +55,7 @@ TextStyle basicSmallDarkBlue =  TextStyle(fontFamily: defaultFont, fontSize: 15,
 
 //  TextStyle basicBlue =  TextStyle(fontFamily: defaultFont, fontSize: 19, color: sprinklerBlue, fontWeight: FontWeight.w400);
 TextStyle basicRed =  TextStyle(fontFamily: defaultFont, fontSize: 19, color: red, fontWeight: FontWeight.w400);
+TextStyle basicRedBold =  TextStyle(fontFamily: defaultFont, fontSize: 19, color: red, fontWeight: FontWeight.w900);
 TextStyle basicLargeBlack =  TextStyle(fontFamily: defaultFont, fontSize: 27, color: darkFontColor, fontWeight: FontWeight.w700);
 TextStyle basicBlackBold =  TextStyle(fontFamily: defaultFont, fontSize: 19, color: darkFontColor, fontWeight: FontWeight.w700);
 TextStyle error =  TextStyle(fontFamily: defaultFont, fontSize: 19, color: red, fontWeight: FontWeight.w400, height: 1.55);

@@ -18,6 +18,7 @@ import 'package:filament_left/models/profiles.dart';
 import 'package:filament_left/models/scan.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:camera/camera.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image/image.dart' as img;
@@ -52,7 +53,7 @@ class CameraState extends State<Camera> {
   bool showCapturedPhoto = false;
   File imageFile;
   String debugString = "debug:";
-  Uint8List rectImage;
+  var rectImage;
   bool scanning = false;
   var rgb;
   var interpreter;
@@ -86,7 +87,7 @@ class CameraState extends State<Camera> {
         BlocProvider.of<OptInBloc>(context).add(SetOptIns(optInList));
       },
     );
-    // interpreter = await tfl.Interpreter.fromAsset('v11-model.tflite');
+    // interpreter = await tfl.Interpreter.fromAsset('v15-model.tflite');
   }
 
   @override
@@ -133,8 +134,11 @@ class CameraState extends State<Camera> {
         Scan.diameter = (Scan.profile.width/ratio).round();
       }
       img.Image rectangleConversion = img.decodeImage(byteData);
-      rectImage = img.encodePng(img.drawRect(rectangleConversion, startX.toInt(), startY.toInt(), endX.toInt(), endY.toInt(), img.getColor(29, 204, 183)));
-      // img.drawRect(dst, x1, y1, x2, y2, color)
+      rectImage = img.drawRect(rectangleConversion, startX.toInt(), startY.toInt(), endX.toInt(), endY.toInt(), img.getColor(29, 204, 183));
+      rectImage = img.copyRotate(rectImage, 90);
+      rectImage = img.drawString(rectImage, img.arial_24, startX.toInt(), startY.toInt(), "Hatchbox PLA: 250g remaining 100 meters remaining");
+      rectImage = img.encodePng(rectImage);
+
     });
 
     
@@ -142,7 +146,7 @@ class CameraState extends State<Camera> {
 
   Future<List> recognize(List imageList) async {
     if(interpreter == null){
-      interpreter = await tfl.Interpreter.fromAsset('v11-model.tflite');
+      interpreter = await tfl.Interpreter.fromAsset('v15-model.tflite');
     }
     // print("recognize");
     imageCache.clear();
@@ -360,18 +364,6 @@ class CameraState extends State<Camera> {
 
 
 
-            // OptIn optIn = OptIn(
-            //   id: 1,
-            //   optIn: 0,
-            // );
-            // setState(() {
-            //   DatabaseProviderOptIn.db.update(optIn).then(
-            //     (measureList) {
-            //       BlocProvider.of<OptInBloc>(context).add(UpdateOptIn(0, optIn));
-            //     },
-            //   );
-            // });
-
 
 
 
@@ -386,248 +378,395 @@ class CameraState extends State<Camera> {
                 return Container(
                   child: Column(
                     children: [
-                      SizedBox(height: CurrentDevice.hasNotch ? 36 : 28),
-                      
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children:[
-                            Container(
-                              width: 55,
-                              child: IconButton(icon: Icon(Icons.chevron_left, color: darkFontColor,), onPressed: (){Navigator.pop(context);}, iconSize: 50)
-                            ),
-                            Row(
-                              children: [
-                                Text(langMap()['scan'], style: pageHeader,),
-                                SizedBox(width: 5),
-                                // Container(
-                                //   child: Text("Beta", style: basicBlack,),
-                                //   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 14),
-                                //   decoration: BoxDecoration(
-                                //     color: Colors.white,
-                                //     borderRadius: BorderRadius.circular(20),
-                                //   ),
-                                // ),
-                              ],
-                            ),
-                            SizedBox(width: 55,)
-
-                            
-                          ]
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      result(),
-                      SizedBox(height: 15),
-                      SizedBox(height: 15),
+  
                       
                       
 
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
+                        // child: SingleChildScrollView(
+                        child: Column(
+                          children: [
 
-                              scanning ? Container(
-                                // width: MediaQuery.of(context).size.width *.5,
-                                height: 400,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Loading(),
-                                      Text("Running Scanning... this make take a few seconds")
-                                    ],
-                                  )
+                            scanning ? Container(
+                              // width: MediaQuery.of(context).size.width *.5,
+                              height: 400,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Loading(),
+                                    Text("Running Scanning... this make take a few seconds")
+                                  ],
                                 )
                               )
+                            )
 
-                              :
+                            :
 
-                              rectImage == null 
+                            rectImage == null 
 
-                              ?
-
-                              Column(
-                                children:[
-                                  SizedBox(height: 20),
-                                  Container(
-                                    child: Center(child: Text(langMap()['dblCheck'], textAlign: TextAlign.center,)),
-                                    width: MediaQuery.of(context).size.width*.9,
-                                  ),
-                                  SizedBox(height:30),
-                                  FutureBuilder<void>(
-                                    future: _initializeControllerFuture,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.done) {
-                                        // If the Future is complete, display the preview.
-                                        // return Transform.scale(
-                                        //   scale: deviceRatio/_controller.value.aspectRatio ,
-                                        //   child: Center(
-                                        //     child: AspectRatio(
-                                        //       aspectRatio: _controller.value.aspectRatio,
-                                        //       child: CameraPreview(_controller), //cameraPreview
-                                        //     ),
-                                        //   )
-                                        // );
+                            ?
 
 
-                                        return Container(
-                                          width: MediaQuery.of(context).size.width*.5,
-                                          height: MediaQuery.of(context).size.height*.5,
-                                          child: ClipRect(
-                                            child: OverflowBox(
-                                              alignment: Alignment.center,
-                                              child: FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Container(
-                                                  width: MediaQuery.of(context).size.width*.5,
-                                                  height: MediaQuery.of(context).size.height*.5,
-                                                  child: CameraPreview(_controller), // this is my CameraPreview
-                                                ),
+                            FutureBuilder<void>(
+                              future: _initializeControllerFuture,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  // If the Future is complete, display the preview.
+                                  // return Transform.scale(
+                                  //   scale: deviceRatio/_controller.value.aspectRatio ,
+                                  //   child: Center(
+                                  //     child: AspectRatio(
+                                  //       aspectRatio: _controller.value.aspectRatio,
+                                  //       child: CameraPreview(_controller), //cameraPreview
+                                  //     ),
+                                  //   )
+                                  // );
+
+
+                                  return Stack(
+                                    children: [
+
+                                      Container(
+                                        width: MediaQuery.of(context).size.width,
+                                        height: MediaQuery.of(context).size.height,
+                                        child: ClipRect(
+                                          child: OverflowBox(
+                                            alignment: Alignment.center,
+                                            child: FittedBox(
+                                              fit: BoxFit.fitWidth,
+                                              child: Container(
+                                                width: MediaQuery.of(context).size.width,
+                                                height: MediaQuery.of(context).size.height,
+                                                
+                                                child: CameraPreview(_controller), // this is my CameraPreview
                                               ),
                                             ),
                                           ),
-                                        );
-                                        // return CameraPreview(_controller);
-                                      }
-                                       
-                                      else {
-                                        return Center(
-                                          child: CircularProgressIndicator()
-                                        ); 
-                                      }
-                                    },
-                                  ),
-                                  SizedBox(height:8),
-                                  InkWell(
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 30,vertical: 17),
-                                      decoration: BoxDecoration(
-                                        color: darkBlue,
-                                        borderRadius: BorderRadius.circular(10)
+                                        ),
                                       ),
-                                      child: Text(langMap()['scan']),
-                                    ),
-                                    onTap: () async {
-                                      setState(() {
-                                        scanning = true;
-                                      });
-                                      File tempFile = await takePhoto();
-                                      setState(() {
-                                        imageFile = tempFile;
-                                      });
-                                      await scanImage(imageFile);
-                                      if(Scan.profile != null){
-                                        Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
-                                        Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
-                                        Scan.diameter = (Scan.profile.width/ratio).round();
-                                      }
-                                      analytics.logEvent(name: "scan", parameters: {"optIn": optInList[0].optIn == 2 ? true : false});
-                                      if(optInList[0].optIn == 2){
-                                        uploadFile(_image, "images");
-                                        uploadFile(await getImageFileFromAssets(rectImage), "output");                                      
-                                      }
-                                      setState(() {
-                                        scanning = false;
-                                      });
-                                    },
-                                  ),
-                                ]
-                              )
 
 
-                              :
 
-                              Column(
-                                children: [
-                                  RotatedBox(
-                                    quarterTurns: 1,
-                                    child: Image.memory(rectImage, width: (MediaQuery.of(context).size.width *.5)*2,),
-                                  ),
-                                  SizedBox(height:8),
-                                  InkWell(
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 30,vertical: 17),
-                                      decoration: BoxDecoration(
-                                        color: darkBlue,
-                                        borderRadius: BorderRadius.circular(10)
-                                      ),
-                                      child: Text(langMap()['rescan']),
-                                    ),
-                                    onTap: () async {
-                                      setState(() {
-                                        rectImage = null;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
+                                      Container(
+                                        height: MediaQuery.of(context).size.height,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
 
 
-                              SizedBox(height:10),
 
-                              profileList.length == 0 ?
-                                Text(langMap()['spoolReqStr'], style: basicBlack, textAlign: TextAlign.center,)
-                                :
+                                            Column(
+                                              children:[ 
+                                                SizedBox(height: CurrentDevice.hasNotch ? 36 : 15),
+                                                Container(
+                                                  width: MediaQuery.of(context).size.width,
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children:[
+                                                      Container(
+                                                        width: 55,
+                                                        child: IconButton(icon: Icon(Icons.chevron_left, color: darkFontColor,), onPressed: (){Navigator.pop(context);}, iconSize: 50)
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Text(langMap()['scan'], style: pageHeader,),
+                                                          SizedBox(width: 5),
+                                                          Container(
+                                                            child: Text("Beta", style: basicBlack,),
+                                                            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 14),
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white,
+                                                              borderRadius: BorderRadius.circular(20),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(width: 55,)
+
+                                                      
+                                                    ]
+                                                  ),
+                                                ),
+                                              ]
+                                            ),
+
+
+
+
+                                            Column(
+                                              children: [
+
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    shape: CircleBorder(), 
+                                                    primary: Colors.transparent
+                                                  ),
+                                                  child: Container(
+                                                    width: 80,
+                                                    height: 80,
+                                                    alignment: Alignment.center,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        color: darkBlue,
+                                                        width: 8
+                                                      )
+                                                    ),
+
+                                                  ),
+                                                  onPressed: () async{
+                                                    setState(() {
+                                                      scanning = true;
+                                                    });
+                                                    File tempFile = await takePhoto();
+                                                    setState(() {
+                                                      imageFile = tempFile;
+                                                    });
+                                                    await scanImage(imageFile);
+                                                    if(Scan.profile != null){
+                                                      Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
+                                                      Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
+                                                      Scan.diameter = (Scan.profile.width/ratio).round();
+                                                      if(Scan.grams < 100){
+                                                        Flushbar(
+                                                          margin: EdgeInsets.all(5),
+                                                          borderRadius: 8,
+                                                          duration: Duration(seconds: 10),
+                                                          icon: Icon(Icons.warning, color: Colors.red,),
+                                                          // titleText: Text("Uh Oh, It looks like you are running low on ${Scan.profile.name} ${Scan.profile.filamentType}", style: basicRedBold,),
+                                                          messageText: Text("It looks like you are running low on ${Scan.profile.name} ${Scan.profile.filamentType}", style: basicRedBold,),
+                                                          mainButton: InkWell(
+                                                            onTap: (){
+                                                              print(Scan.profileName);
+                                                              BuyMore.brand = Scan.name; 
+                                                              BuyMore.material = Scan.profile.filamentType;
+                                                              BuyMore.size = Scan.profile.filamentSize;
+                                                              BuyMore.rgb = rgb;
+                                                              buyMorePopUp(context);
+                                                            }, 
+                                                            child: Container(
+                                                              padding: EdgeInsets.all(10),
+                                                              width: 120,
+                                                              decoration: BoxDecoration(
+                                                                color: getColor(Scan.grams),
+                                                                borderRadius: BorderRadius.circular(10)
+                                                              ),
+                                                              child: Row(
+                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                children: [
+                                                                  Text(langMap()['buyMore'], style: basicWhite,),
+                                                                  // SizedBox(width:8),
+                                                                  // Icon(Icons.open_in_new, color: whiteFontColor, size: 18,)
+                                                                ],
+                                                              ),
+                                                            )
+                                                          ),
+
+                                                        )..show(context);
+                                                      }
+                                                    }
+                                                    analytics.logEvent(name: "scan", parameters: {"optIn": optInList[0].optIn == 2 ? true : false});
+                                                    if(optInList[0].optIn == 2){
+                                                      uploadFile(_image, "images");
+                                                      uploadFile(await getImageFileFromAssets(rectImage), "output");                                      
+                                                    }
+                                                    setState(() {
+                                                      scanning = false;
+                                                    });
+                                                  },
+                                                ),
+                                            
+                                                SizedBox(height: 20,)
+                                              ]
+                                            )
+
+
+                                          ],
+                                        )
+                                      )
+
+                                    ],
+                                  );
+                                  // return CameraPreview(_controller);
+                                }
+                                  
+                                else {
+                                  return Center(
+                                    child: CircularProgressIndicator()
+                                  ); 
+                                }
+                              },
+                            )
+
+                            :
+
+                            Stack(
+                              children: [
+                                Image.memory(rectImage),
                                 Container(
-                                  padding: EdgeInsets.all(9),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: whiteFontColor,
-                                  ),
-                                  width: MediaQuery.of(context).size.width*.7,
-                                  child: DropdownButtonFormField<String>(
-                                    isExpanded:true,
-                                    iconEnabledColor: darkBlue,
-                                    dropdownColor: Colors.white,
-                                    validator: (value) => value == null ? langMap()['spoolReq'] : null,
-                                    value: Scan.profileName,
-                                    hint: Text(
-                                      langMap()['slctSpool'],
-                                      style: basicDarkBlue,
-                                    ),
-                                    items: profileList.map((var value) {
-                                      return new DropdownMenuItem<String>(
-                                        
-                                        value: value.id.toString(),
-                                        child: new Text("${value.name} - ${value.filamentSize}${langMap()['mm']} ${value.filamentType}", style: basicDarkBlue, overflow: TextOverflow.ellipsis,),
-                                      );
-                                    }).toList(),
-                                    onChanged: (value) {
-                                      setState((){
-                                        // print(value);
-                                        Scan.profileName = value;
-                                        for(var document in profileList){
-                                          if(document.id.toString() == value){
-                                            Scan.profile = document;
-                                            Scan.name = document.name;
-                                          }
-                                        }
-                                      });
-                                      if(byteData != null){
-                                          Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
-                                          Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
-                                          Scan.diameter = (Scan.profile.width/ratio).round();
-                                        }
-                                    },
+                                  height: MediaQuery.of(context).size.height,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+
+
+
+                                      Column(
+                                        children:[ 
+                                          SizedBox(height: CurrentDevice.hasNotch ? 36 : 15),
+                                          Container(
+                                            width: MediaQuery.of(context).size.width,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children:[
+                                                Container(
+                                                  width: 55,
+                                                  child: IconButton(icon: Icon(Icons.chevron_left, color: darkFontColor,), onPressed: (){Navigator.pop(context);}, iconSize: 50)
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(langMap()['scan'], style: pageHeader,),
+                                                    SizedBox(width: 5),
+                                                    Container(
+                                                      child: Text("Beta", style: basicBlack,),
+                                                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 14),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius: BorderRadius.circular(20),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(width: 55,)
+
+                                                
+                                              ]
+                                            ),
+                                          ),
+                                        ]
+                                      ),
+
+
+
+
+                                      Column(
+                                        children: [
+
+                                          InkWell(
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 30,vertical: 17),
+                                              decoration: BoxDecoration(
+                                                color: darkBlue,
+                                                borderRadius: BorderRadius.circular(10)
+                                              ),
+                                              child: Text(langMap()['rescan']),
+                                            ),
+                                            onTap: () async {
+                                              setState(() {
+                                                rectImage = null;
+                                              });
+                                            },
+                                          ),
+                                      
+                                          SizedBox(height: 20,)
+                                        ]
+                                      )
+
+
+                                    ],
                                   )
                                 ),
+                              ],
+                            ),
 
 
-                              
-                              
-                              // InkWell(
-                              //   child: Text("Learn about submitting photos to get pro for free.", style: basicSmallDarkBlue,),
-                              //   onTap: () {
-                              //     freePro();
-                              //   },
-                              // ),
-                              SizedBox(height:30),
-                              // Text(debugString),
-                            ]
-                          )
+                            // SizedBox(height:10),
+
+                            // profileList.length == 0 ?
+                            //   Text(langMap()['spoolReqStr'], style: basicBlack, textAlign: TextAlign.center,)
+                            //   :
+                            //   Container(
+                            //     padding: EdgeInsets.all(9),
+                            //     decoration: BoxDecoration(
+                            //       borderRadius: BorderRadius.circular(10),
+                            //       color: whiteFontColor,
+                            //     ),
+                            //     width: MediaQuery.of(context).size.width*.7,
+                            //     child: DropdownButtonFormField<String>(
+                            //       isExpanded:true,
+                            //       iconEnabledColor: darkBlue,
+                            //       dropdownColor: Colors.white,
+                            //       validator: (value) => value == null ? langMap()['spoolReq'] : null,
+                            //       value: Scan.profileName,
+                            //       hint: Text(
+                            //         langMap()['slctSpool'],
+                            //         style: basicDarkBlue,
+                            //       ),
+                            //       items: profileList.map((var value) {
+                            //         return new DropdownMenuItem<String>(
+                                      
+                            //           value: value.id.toString(),
+                            //           child: new Text("${value.name} - ${value.filamentSize}${langMap()['mm']} ${value.filamentType}", style: basicDarkBlue, overflow: TextOverflow.ellipsis,),
+                            //         );
+                            //       }).toList(),
+                            //       onChanged: (value) {
+                            //         setState((){
+                            //           // print(value);
+                            //           Scan.profileName = value;
+                            //           for(var document in profileList){
+                            //             if(document.id.toString() == value){
+                            //               Scan.profile = document;
+                            //               Scan.name = document.name;
+                            //             }
+                            //           }
+                            //         });
+                            //         if(byteData != null){
+                            //             Scan.meters = filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round();
+                            //             Scan.grams = metersToGrams(filamentLeft((Scan.profile.width/ratio).round(), Scan.profile.inner, Scan.profile.width, Scan.profile.filamentSize, false).round(), Scan.profile.filamentType, Scan.profile.filamentSize == 2.85 ? true : false).round();
+                            //             Scan.diameter = (Scan.profile.width/ratio).round();
+                            //             if(Scan.grams < 100){
+                            //               Flushbar(
+                            //                 margin: EdgeInsets.all(5),
+                            //                 borderRadius: 8,
+                            //                 duration: Duration(seconds: 10),
+                            //                 icon: Icon(Icons.warning, color: Colors.red,),
+                            //                 // titleText: Text("Uh Oh, It looks like you are running low on ${Scan.profile.name} ${Scan.profile.filamentType}", style: basicRedBold,),
+                            //                 messageText: Text("It looks like you are running low on ${Scan.profile.name} ${Scan.profile.filamentType}", style: basicRedBold,),
+                            //                 mainButton: InkWell(
+                            //                   onTap: (){
+                            //                     print(Scan.profileName);
+                            //                     BuyMore.brand = Scan.name; 
+                            //                     BuyMore.material = Scan.profile.filamentType;
+                            //                     BuyMore.size = Scan.profile.filamentSize;
+                            //                     BuyMore.rgb = rgb;
+                            //                     buyMorePopUp(context);
+                            //                   }, 
+                            //                   child: Container(
+                            //                     padding: EdgeInsets.all(10),
+                            //                     width: 120,
+                            //                     decoration: BoxDecoration(
+                            //                       color: getColor(Scan.grams),
+                            //                       borderRadius: BorderRadius.circular(10)
+                            //                     ),
+                            //                     child: Row(
+                            //                       mainAxisAlignment: MainAxisAlignment.center,
+                            //                       children: [
+                            //                         Text(langMap()['buyMore'], style: basicWhite,),
+                            //                         // SizedBox(width:8),
+                            //                         // Icon(Icons.open_in_new, color: whiteFontColor, size: 18,)
+                            //                       ],
+                            //                     ),
+                            //                   )
+                            //                 ),
+
+                            //               )..show(context);
+                            //             }
+                            //           }
+                            //       },
+                            //     )
+                            //   ),
+                          ]
                         )
                       )
                     ]

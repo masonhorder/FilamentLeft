@@ -43,8 +43,8 @@ android {
         applicationId "com.masonhorder.filamentleft"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 9
-        versionName "3.4.1"
+        versionCode 12
+        versionName "3.4.4"
     }
     signingConfigs {
         release {

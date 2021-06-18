@@ -76,7 +76,7 @@ flutter:
   assets:
     - assets/help-diam.png
     - assets/help-circumference.png
-    - assets/v11-model.tflite
+    - assets/v15-model.tflite
     - assets/example.JPG
     - assets/phone1.png
     - assets/phone1-arrow.png
