@@ -104,11 +104,11 @@ metersToGrams(num meters, String filamentType, bool filament){
 
 
 
-Future<String> uploadFile(File _image, String path) async {
-  
+Future<List> uploadFile(File _image, String path) async {
+  var time = DateTime.now().microsecondsSinceEpoch;
   Reference storageReference = FirebaseStorage.instance
       .ref()
-      .child('$path/${DateTime.now().microsecondsSinceEpoch}.png');
+      .child('$path/$time.png');
   UploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask;
   // print('File Uploaded');
@@ -116,7 +116,7 @@ Future<String> uploadFile(File _image, String path) async {
   await storageReference.getDownloadURL().then((fileURL) {
     returnURL =  fileURL;
   });
-  return returnURL;
+  return [returnURL, time];
 }
 
 

@@ -1,0 +1,90 @@
+<head>
+	<title>Filament Left Console</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<script>
+	function openAnnotate(){
+		window.open("/annotate", "_top")
+	}
+</script>
+<body class="page">
+	<div class="topBar">
+		<p class="title">Filament Left Console</p>
+	</div>
+
+	<div class="body">
+		<div class="boxes">
+
+
+			<!-- left column -->
+			<div class="column">
+
+
+				<div class="box">
+					<p class="boxTitle">Recent Usage of Features</p>
+				</div>
+
+
+				<!-- Box for new scan performance -->
+				<div class="box">
+					<p class="boxTitle">Scan Performance(Based on tests run after each model)</p>
+				</div>
+
+
+				<!-- Annotate incoming images -->
+				<div class="box" onclick="openAnnotate()">
+
+					<p class="boxTitle">Annotate Incoming Images:</p>
+					<p>{{imageCount}} images to annotate</p>
+
+					<div class="imageGridContainer">
+						{% for image in imageUrls %}
+
+						<div align="center" class="image">
+
+							<div>
+								<img src="{{image}}" width="115px" style="border-radius: 19px;">
+							</div>
+
+							<div>
+								<form action="">
+									<input class="redDeleteButton" value="" type="button" name="delete">
+								</form>
+							</div>
+
+						</div>
+
+						{% endfor %}
+					</div>
+
+
+				</div>
+
+
+
+			</div>
+
+
+
+
+
+		<!-- right column -->
+		<div class="column">
+
+			<div class="box">
+				<p class="boxTitle">Opted-In Scans</p>
+			</div>
+
+			<div class="box">
+				<p class="boxTitle">Scan Performance(Based on Opted-In users)</p>
+			</div>
+
+
+
+			
+		</div>
+	</div>
+</body>
+
+</html>

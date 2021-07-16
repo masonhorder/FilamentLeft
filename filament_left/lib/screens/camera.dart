@@ -16,6 +16,7 @@ import 'package:filament_left/models/currentDevice.dart';
 import 'package:filament_left/models/optIn.dart';
 import 'package:filament_left/models/profiles.dart';
 import 'package:filament_left/models/scan.dart';
+import 'package:filament_left/models/scanVersion.dart';
 import 'package:filament_left/style/globals.dart';
 import 'package:camera/camera.dart';
 import 'package:flushbar/flushbar.dart';
@@ -25,6 +26,7 @@ import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart' as tfl;
 import 'package:image_size_getter/image_size_getter.dart';
 import 'package:image_size_getter/file_input.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 
@@ -58,6 +60,8 @@ class CameraState extends State<Camera> {
   var interpreter;
   List rotatedCoordinates = [];
   var finalImage;
+  final firestoreInstance = FirebaseFirestore.instance;
+
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
@@ -571,9 +575,19 @@ class CameraState extends State<Camera> {
                                                       }
                                                     }
                                                     analytics.logEvent(name: "scan", parameters: {"optIn": optInList[0].optIn == 2 ? true : false});
+                                                    uploadFile(await getImageFileFromAssets(rectImage), "output");
+                                                    uploadFile(_image, "images");
                                                     if(optInList[0].optIn == 2){
-                                                      uploadFile(_image, "images");
-                                                      uploadFile(await getImageFileFromAssets(rectImage), "output");                                      
+
+                                                      var imageData = await uploadFile(_image, "scans");
+                                                      firestoreInstance.collection("images").doc(imageData[1].toString()).set({
+                                                        "fileLocation": imageData[0],
+                                                        "scannedCoordinates": finalCoordinates,
+                                                        "versionCode": ScanVersion.scanVersion,
+                                                        "annotatedCoordinates": [null, null, null, null],
+                                                        "status": 0,
+                                                        "date": DateTime.now().millisecondsSinceEpoch
+                                                      });                                     
                                                     }
                                                     setState(() {
                                                       scanning = false;

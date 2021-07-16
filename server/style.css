@@ -1,0 +1,93 @@
+body{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topBar{
+  margin-top: -30px;
+  margin-left: -10px;
+  margin-right: -10px;
+  background-color: white;
+  padding: 12px;
+  border-radius:0px 0px 20px 20px;
+  box-shadow: 10px 5px 15px 0px rgba(0, 0, 0, .5);
+}
+
+.title{
+  margin-left: 30px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 30px;
+}
+
+.page{
+  background-color:rgb(252, 185, 0)
+}
+
+
+.boxes{
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  padding: 0;
+}
+
+.column {
+  flex: 0 0 auto;
+  width: 45%;
+}
+
+.box{
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  background-color: white;
+  padding:1%;
+  margin-bottom: 52px;
+  border-radius: 25px;
+  box-shadow: 8px 8px 4px rgba(65, 64, 64, .2);
+}
+
+.box:hover{
+  transition: 0.2s;
+  box-shadow: 10px 10px 4px rgba(65, 64, 64, .3);
+  cursor:pointer;
+}
+
+.body{
+  margin-top: 30px;
+}
+
+.boxTitle{
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.imageGridContainer{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.image{
+  margin-top: 50px;
+}
+
+.redDeleteButton{
+  margin-top:3px;
+  background-color: red;
+  border: none;
+  border-radius: 10px;
+  padding:7px;
+  font-size: 15px;
+  color: white;
+  box-shadow: 3px 4px 5px rgba(70, 52, 52, 0.4);
+}
+
+.redDeleteButton:hover{
+  cursor: pointer;
+  box-shadow: 5px 6px 7px rgba(0, 0, 0, .4);
+}
